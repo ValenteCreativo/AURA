@@ -1,0 +1,575 @@
+AURA / ARVI — CONTEXTO INICIAL PARA AGENTE DE DESARROLLO
+Documento vivo para construir una demo física + web para Bosques & Tech 2026
+Fecha base: 29 de abril de 2026
+Autor humano: Valentín Martínez
+Asistente conceptual/técnico: ChatGPT / Arquero
+
+
+1. NOMBRE DEL PROYECTO
+
+Nombre principal propuesto:
+AURA - Autonomous Urban Regeneration Via Audio
+
+Nombre técnico / linaje:
+ARVI — Agentic Regeneration Via Intelligence
+
+Frase base:
+AURA: inteligencia ambiental autónoma a través del sonido.
+
+Frase alternativa:
+AURA: el bosque respira, el sistema escucha.
+
+Descripción corta:
+AURA es una demostración experimental de inteligencia ambiental que combina sensores físicos, datos ambientales y una interfaz web artística para traducir señales del entorno en estados comprensibles: calma, estrés, alerta o regeneración.
+
+En esta primera versión, AURA utiliza un ESP32 y un sensor de temperatura/humedad para crear un nodo ambiental básico. El sistema se conecta a una visualización web donde los datos se transforman en una experiencia viva: el entorno “respira”, cambia y comunica su estado.
+
+
+2. CONTEXTO DEL EVENTO
+
+Evento:
+Bosques & Tech 2026
+
+Organizadores / ecosistema:
+Reforestamos México, Centro México Digital, Plataforma Mexicana de Carbono, Integrated Remote Sensing Studio, IBERO / CENTRUS.
+
+Lugar:
+Bioparque San Antonio, CDMX
+
+Fechas:
+5 y 6 de mayo de 2026
+
+Espacio relevante:
+Demostraciones tecnológicas simultáneas organizadas por grupos.
+
+Participación de AURA:
+Día 6 de mayo, dentro de las demostraciones tecnológicas, bajo el concepto:
+“Inteligencia ambiental autónoma a través del sonido”.
+
+Contexto temático del evento:
+Tecnologías para bosques, ciudades y personas. Hay presencia de temas como LiDAR, inventarios urbanos, monitoreo forestal, sensores, IA, plataformas geoespaciales, conservación, sonido de plantas, drones, robótica y ciudades árbol.
+
+
+3. OBJETIVO DE LA DEMO
+
+No construir un producto final.
+No simular una startup terminada.
+No intentar resolver todo el monitoreo ambiental en una semana.
+
+Objetivo real:
+Crear una experiencia demostrativa, clara y memorable que haga sentir que los ecosistemas pueden tener una interfaz sensible, autónoma y expresiva.
+
+La demo debe comunicar:
+- El ambiente puede ser leído como una red de señales.
+- Los sensores pueden convertir fenómenos invisibles en datos útiles.
+- La inteligencia artificial puede ayudar a interpretar patrones ambientales.
+- Una red futura de nodos podría apoyar monitoreo urbano, conservación, alertas tempranas y toma de decisiones.
+- La tecnología no tiene que sentirse fría: puede ser poética, sensible y profundamente humana.
+
+Idea central:
+“El bosque tiene sistema nervioso. AURA es una primera interfaz para escucharlo.”
+
+
+4. ALCANCE REALISTA DE LA VERSIÓN 1
+
+Hardware disponible:
+- Kit Steren BioMakers compatible con Arduino Uno.
+- Placa ESP32 Steren.
+- Sensor de temperatura y humedad Steren, probablemente tipo DHT11.
+- Panel solar de 3 Vcc y 150 mA.
+- Protoboard.
+- Cables Dupont.
+- Resistencias de 220 ohms.
+- LEDs.
+- LED RGB.
+- Botón pulsador.
+- Potenciómetros 10k.
+- Display de 7 segmentos.
+- Transistor NPN.
+- Motor DC.
+- Cable USB A-B para Arduino Uno.
+- Componentes básicos del kit de iniciación.
+
+Alcance técnico mínimo:
+- ESP32 lee temperatura y humedad.
+- ESP32 muestra lecturas en Serial Monitor.
+- ESP32 expone datos a una interfaz web local o endpoint simple.
+- Web app visualiza el estado ambiental en tiempo real o semi-tiempo-real.
+- Web app interpreta los datos como estados ambientales.
+
+Estados sugeridos:
+- Calma / equilibrio.
+- Estrés térmico.
+- Humedad baja.
+- Humedad alta.
+- Alerta.
+- Recuperación / regeneración.
+
+Alcance simbólico:
+Aunque la primera versión no tenga micrófono físico, el concepto debe dejar preparada la narrativa de bioecoacústica:
+- En futuras versiones, AURA integrará sonido ambiental, aves, biophonía, ruido urbano y patrones acústicos.
+- En esta versión, el sensor ambiental funciona como el primer órgano del sistema.
+- El sonido puede simularse en web o mediante muestras pregrabadas si se necesita para la experiencia.
+
+
+5. LO QUE NO DEBE HACERSE EN V1
+
+Evitar:
+- Blockchain real obligatoria.
+- Tokenomics.
+- DePIN completo.
+- Dashboard demasiado corporativo.
+- Muchas páginas.
+- Arquitectura demasiado grande.
+- Dependencias técnicas innecesarias.
+- Prometer precisión científica que todavía no existe.
+- Decir que ya detecta salud del bosque con rigor científico.
+
+Sí se puede decir:
+- Prototipo experimental.
+- Demostración de investigación.
+- Primer nodo ambiental.
+- Interfaz especulativa / funcional para inteligencia ambiental.
+- Exploración de sensores distribuidos y análisis ambiental autónomo.
+
+
+6. LINAJE CONCEPTUAL
+
+Este proyecto no surge de la nada. Es la evolución de varios experimentos previos:
+
+REMBU — Red de Evaluación y Monitoreo de Bosques Urbanos
+Idea base: sensores descentralizados para monitorear arbolado urbano y bosques urbanos.
+Aprendizaje: la medición ambiental distribuida puede ayudar a hacer visible la salud de ecosistemas urbanos, pero necesita claridad operativa, bajo costo, incentivos y adopción institucional.
+
+SEN — Sensor Economy Network
+Idea base: una economía donde los datos de sensores tienen valor y pueden ser compartidos, comprados o recompensados.
+Aprendizaje: los sensores no solo capturan datos; pueden convertirse en infraestructura económica, pero requieren confianza, utilidad, trazabilidad y mecanismos simples de participación.
+
+AONA — Autonomous Oracles for Networked Aquatic Systems
+Idea base: agentes autónomos que interpretan señales ambientales, detectan patrones y generan sugerencias, alertas o acciones.
+Aprendizaje: la IA puede actuar como una capa interpretativa entre el mundo físico y la toma de decisiones, siempre que existan guardrails y límites claros.
+
+ARVI — Agentic Regeneration Via Intelligence
+Idea base: red de inteligencia ambiental donde sensores + agentes + datos + acciones verificables permiten respuestas regenerativas.
+Aprendizaje: el futuro del monitoreo ambiental no es solo “ver dashboards”, sino crear sistemas que perciben, interpretan, sugieren, registran y eventualmente actúan.
+
+AURA — versión demostrativa sensible
+Idea base: llevar ARVI a una experiencia clara, bella y presentable en Bosques & Tech: un primer nodo ambiental que convierte señales físicas en una visualización viva.
+
+
+7. NARRATIVA DE DISEÑO
+
+El diseño no debe sentirse como:
+- SaaS genérico.
+- Dashboard corporativo.
+- Plantilla de climate tech.
+- App Web3 obvia.
+- Pitch deck disfrazado de web.
+- Estética de “startup verde” básica.
+
+Debe sentirse como:
+- Un sistema vivo.
+- Un laboratorio poético.
+- Una interfaz entre humanos y ecosistemas.
+- Un artefacto de campo.
+- Un instrumento ambiental.
+- Una mezcla entre ciencia, bosque, arte sonoro y tecnología autónoma.
+
+Palabras clave estéticas:
+- Bioecoacústica.
+- Sensorial.
+- Regenerativo.
+- Bosque urbano.
+- Señales invisibles.
+- Sistema nervioso ambiental.
+- Respiración.
+- Pulso.
+- Micelio.
+- Ondas.
+- Cartografía viva.
+- Instrumento científico-poético.
+- Tecnología suave.
+- Futuro ancestral.
+- Field lab.
+- Ambient intelligence.
+- No convencional.
+- Artsy.
+- Minimalismo orgánico.
+- Interfaz sensible.
+
+Referencias estéticas internas del usuario:
+- Gusto por interfaces artísticas, raras y memorables.
+- Deseo de evitar diseños genéricos de IA.
+- Preferencia por experiencias que se sientan vivas y con misterio.
+- Interés por sonido, vibración, bioecoacústica, sensores, DePIN, agentes e infraestructura invisible.
+- Preferencia por diseño minimalista pero simbólicamente poderoso.
+- Energía de pantera: precisión, elegancia, sigilo, inteligencia y potencia contenida.
+- Gusto por landing pages interactivas tipo viaje/scrollytelling.
+- Deseo de que la web no explique demasiado, sino que haga sentir.
+
+
+8. DIRECCIÓN DE PRODUCTO PARA LA WEB
+
+La web debe servir como:
+1. Demo visual en vivo.
+2. Explicación clara del concepto.
+3. Interfaz para mostrar lecturas del sensor.
+4. Narrativa de futuro.
+5. Pieza memorable para jueces, aliados y asistentes.
+
+Estructura sugerida:
+
+Hero:
+- Nombre: AURA
+- Frase: “Inteligencia ambiental autónoma a través del sonido.”
+- Subfrase: “Un primer nodo experimental para traducir señales del entorno en estados vivos.”
+- Visual central: esfera/onda/árbol abstracto que respira según los datos.
+
+Live Node:
+- Temperatura actual.
+- Humedad actual.
+- Estado ambiental.
+- Señal recibida del nodo.
+- Indicador: “Nodo ESP32 activo”.
+
+Interpretación:
+- “El entorno muestra humedad estable.”
+- “Posible estrés térmico.”
+- “Condiciones favorables para actividad biológica.”
+- “La señal sugiere atención.”
+
+Future Layer:
+- Sonido ambiental.
+- Bioecoacústica.
+- Red de sensores solares.
+- Agentes de interpretación.
+- Alertas tempranas.
+- Datos verificables.
+- Conservación urbana.
+
+About:
+- AURA nace de la evolución REMBU → SEN → AONA → ARVI.
+- Es un prototipo de investigación para explorar cómo las ciudades pueden escuchar sus ecosistemas.
+
+CTA:
+- “Explorar colaboración”
+- “Conectar nodos ambientales”
+- “Construir el sistema nervioso del bosque urbano”
+
+
+9. RUTA DE PROCESAMIENTO DE DATOS
+
+Ruta V1:
+Sensor DHT11 → ESP32 → lectura de temperatura/humedad → endpoint local / Serial / WiFi → web app → visualización → interpretación ambiental.
+
+Ruta V2:
+Sensor DHT11 + micrófono/sensor de sonido → ESP32 → procesamiento básico → web app → visualización sonora + ambiental.
+
+Ruta V3:
+Múltiples nodos ESP32 → red local / internet → base de datos → análisis con IA → alertas → visualización histórica.
+
+Ruta V4:
+Nodos solares distribuidos → agentes ambientales → registros verificables → colaboración institucional → monitoreo urbano/regenerativo.
+
+Ruta ideal futura:
+Sensores físicos + sonido + clima + datos satelitales + agentes autónomos + trazabilidad + incentivos → red de inteligencia ambiental para ciudades y bosques.
+
+
+10. LÓGICA DE INTERPRETACIÓN V1
+
+Ejemplo simple:
+
+Temperatura:
+- < 18 °C: fresco.
+- 18–28 °C: estable.
+- 29–34 °C: calor moderado.
+- > 34 °C: estrés térmico.
+
+Humedad:
+- < 35%: baja humedad / ambiente seco.
+- 35–70%: rango estable.
+- > 70%: humedad alta.
+
+Estados combinados:
+- Temperatura estable + humedad estable = equilibrio.
+- Temperatura alta + humedad baja = estrés térmico / sequedad.
+- Temperatura alta + humedad alta = posible bochorno / carga ambiental.
+- Temperatura baja + humedad alta = ambiente húmedo/fresco.
+- Cambios bruscos = evento ambiental detectado.
+
+Nota:
+Estos umbrales son demostrativos, no diagnósticos científicos.
+
+
+11. HARDWARE: PLAN DE CONSTRUCCIÓN
+
+Prioridad 1:
+Conectar ESP32 al Arduino IDE.
+
+Prioridad 2:
+Instalar librería del sensor DHT.
+
+Prioridad 3:
+Leer temperatura y humedad por Serial Monitor.
+
+Prioridad 4:
+Encender un LED como indicador físico:
+- Verde: estable.
+- Amarillo: atención.
+- Rojo: alerta.
+
+Prioridad 5:
+Crear endpoint web local en ESP32:
+- /data devuelve JSON con temperatura, humedad y estado.
+
+Prioridad 6:
+Conectar web app local al ESP32.
+
+Prioridad 7:
+Hacer visualización artística.
+
+Prioridad 8:
+Preparar narrativa y demo flow.
+
+
+12. DEMO FLOW PARA EL EVENTO
+
+Duración ideal:
+3 a 5 minutos por grupo/persona.
+
+Guion de interacción:
+1. “AURA es un prototipo de inteligencia ambiental.”
+2. “Este pequeño nodo usa sensores para leer señales invisibles del entorno.”
+3. “Hoy estamos midiendo temperatura y humedad; el siguiente paso es integrar sonido ambiental.”
+4. “La interfaz traduce esos datos en un estado vivo.”
+5. Mostrar dashboard respirando/cambiando.
+6. Tocar el sensor con la mano para subir temperatura/humedad.
+7. Ver cambio en visualización.
+8. “La visión es una red de nodos solares que permita escuchar bosques urbanos y detectar patrones ambientales.”
+9. “No queremos solo dashboards: queremos que los ecosistemas tengan una interfaz sensible para humanos, instituciones y agentes autónomos.”
+
+Elemento teatral simple:
+- Respirar cerca del sensor o cubrirlo con la mano para modificar humedad/temperatura.
+- El sistema cambia de calma a atención.
+- La web reacciona visualmente.
+
+
+13. FRASES POTENTES PARA USAR EN LA WEB O DEMO
+
+“El bosque ya habla. El problema es que nuestras ciudades no saben escucharlo.”
+
+“AURA convierte señales ambientales en una interfaz viva.”
+
+“Cada nodo es un pequeño órgano sensorial del bosque urbano.”
+
+“De sensores aislados a inteligencia ambiental colectiva.”
+
+“No es solo monitoreo. Es una nueva relación entre ciudades y ecosistemas.”
+
+“La bioecoacústica puede revelar actividad invisible: aves, insectos, ruido humano, silencios ecológicos.”
+
+“Hoy medimos temperatura y humedad. Mañana escucharemos patrones de vida.”
+
+“El objetivo no es reemplazar a ecólogos o comunidades, sino darles nuevos sentidos.”
+
+“Un árbol no es solo infraestructura verde. Es parte de una red viva de señales.”
+
+“Queremos construir el sistema nervioso del bosque urbano.”
+
+
+14. TONO DE COMUNICACIÓN
+
+Evitar:
+- Exceso de tecnicismos.
+- Promesas exageradas.
+- Lenguaje cripto innecesario.
+- Decir “IA” cada dos palabras.
+- Decir que ya se resuelve conservación o cambio climático.
+
+Usar:
+- Prototipo.
+- Exploración.
+- Sistema experimental.
+- Nodo sensorial.
+- Interfaz ambiental.
+- Señales vivas.
+- Monitoreo sensible.
+- Inteligencia ambiental.
+- Bioecoacústica.
+- Bosque urbano.
+
+
+15. STACK WEB SUGERIDO
+
+Si se construye con agente:
+- Next.js
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- shadcn/ui opcional
+- Recharts opcional
+- Three.js opcional solo si no complica
+- Web Audio API opcional
+- Fetch a endpoint JSON del ESP32
+- Fallback con datos mock si el ESP32 no está conectado
+
+Principio:
+La demo debe funcionar incluso si falla el hardware.
+
+Por eso la web debe tener:
+- modo live: usa datos del ESP32.
+- modo simulation: datos simulados para presentar sin riesgo.
+- botón para alternar Live / Simulación.
+- indicador claro de conexión.
+
+
+16. REQUISITOS IMPORTANTES PARA EL AGENTE DE DESARROLLO
+
+El agente debe:
+- Leer este archivo completo antes de programar.
+- Priorizar una web funcional y bella sobre una arquitectura excesiva.
+- Crear una experiencia demo-ready.
+- Incluir fallback mock.
+- Mantener código limpio y modular.
+- Evitar sobreingeniería.
+- Usar textos claros y poéticos, no corporativos.
+- Diseñar una interfaz memorable, no genérica.
+- Pensar en una presentación presencial con poca conectividad.
+- Incluir instrucciones para configurar la URL del ESP32.
+- Incluir estados ambientales visuales.
+- Cuidar responsive design para laptop y móvil.
+- Mantener toda la app usable offline/local si es posible.
+
+
+17. COMPONENTES WEB SUGERIDOS
+
+/components
+- AuraHero.tsx
+- LiveNodePanel.tsx
+- EnvironmentalPulse.tsx
+- SensorReadings.tsx
+- EcosystemStateCard.tsx
+- SignalLog.tsx
+- FutureNetwork.tsx
+- DemoModeToggle.tsx
+
+/hooks
+- useAuraSensor.ts
+
+/lib
+- interpretEnvironment.ts
+- mockSensorData.ts
+- auraCopy.ts
+
+/types
+- sensor.ts
+
+.env.local
+NEXT_PUBLIC_ESP32_URL=http://192.168.x.x
+
+
+18. API ESP32 SUGERIDA
+
+Endpoint:
+GET /data
+
+Respuesta:
+{
+  "temperature": 26.4,
+  "humidity": 51.2,
+  "state": "stable",
+  "timestamp": 1710000000000,
+  "nodeId": "AURA-001"
+}
+
+Estados:
+stable
+attention
+alert
+recovering
+
+
+19. PLAN DE 7 DÍAS
+
+Día 1:
+- Configurar Arduino IDE.
+- Conectar ESP32.
+- Probar blink.
+- Conectar DHT11.
+- Leer temperatura/humedad en Serial Monitor.
+
+Día 2:
+- Crear lógica de estados.
+- Encender LEDs según estado.
+- Probar cambios tocando/respirando cerca del sensor.
+
+Día 3:
+- Hacer ESP32 Web Server.
+- Endpoint /data con JSON.
+- Probar desde navegador.
+
+Día 4:
+- Crear web AURA con modo simulation.
+- Diseñar hero + visualización + tarjetas de datos.
+
+Día 5:
+- Conectar web al ESP32.
+- Agregar fallback si no conecta.
+- Pulir visual y copy.
+
+Día 6:
+- Ensayar demo presencial.
+- Preparar guion.
+- Preparar plan B.
+- Verificar cables, laptop, energía, hotspot.
+
+Día 7:
+- Empacar.
+- Ensayo final.
+- Presentación.
+
+
+20. PLAN B
+
+La demo no debe depender 100% del hardware.
+
+Plan B:
+- Web con simulación activada.
+- Video corto del sensor funcionando.
+- Capturas del Serial Monitor.
+- Sensor físico conectado como objeto demostrativo.
+- Narrativa clara.
+
+Plan C:
+- Presentar AURA como prototipo conceptual con mock visual y hardware en mesa.
+
+
+21. FILOSOFÍA DEL PROYECTO
+
+AURA no es solo un sensor.
+AURA es una forma de imaginar ciudades que escuchan.
+
+No se trata de convertir el bosque en dashboard.
+Se trata de crear una interfaz sensible para que humanos, instituciones y agentes puedan responder mejor a señales ecológicas.
+
+La primera versión puede ser pequeña.
+Un ESP32.
+Un sensor azul.
+Un dato de humedad.
+Un pulso en pantalla.
+
+Pero simbólicamente representa algo más grande:
+el inicio de un sistema nervioso ambiental para bosques urbanos.
+
+
+22. INSTRUCCIÓN FINAL PARA EL AGENTE
+
+Construye una web que haga sentir que una pequeña señal física está despertando un sistema vivo.
+
+Debe ser simple.
+Debe ser elegante.
+Debe ser rara.
+Debe ser clara.
+Debe funcionar en demo.
+Debe tener modo simulado.
+Debe honrar la idea: el bosque respira, AURA escucha.
