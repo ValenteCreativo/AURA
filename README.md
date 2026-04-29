@@ -125,6 +125,48 @@ Para la siguiente versión conviene mover lecturas a:
 - Firebase
 - o una base/API dedicada
 
+## ESP32 / DHT11
+
+Se incluye un sketch base en:
+
+- `esp32/aura_node/aura_node.ino`
+
+### Qué hace
+
+- lee el DHT11 en `GPIO4`
+- se conecta al WiFi
+- calcula el estado (`balanced`, `attention`, `alert`)
+- envía lecturas por `POST` a:
+
+```txt
+https://aura-tau-five.vercel.app/api/sensor
+```
+
+### Antes de subirlo al ESP32
+
+Cambia estas variables en el sketch:
+
+```cpp
+const char* ssid = "your-wifi";
+const char* password = "your-password";
+```
+
+### Payload enviado
+
+```json
+{
+  "nodeId": "AURA-001",
+  "temperature": 28.5,
+  "humidity": 31,
+  "state": "attention",
+  "timestamp": 1714410000000
+}
+```
+
+### Nota importante
+
+El sketch usa `WiFiClientSecure` con `setInsecure()` para simplificar la conexión HTTPS con Vercel durante esta fase de demo. Más adelante podemos endurecer esto con validación de certificado o un backend intermedio.
+
 ## Siguiente paso sugerido
 
-Conectar el sketch del ESP32 para enviar lecturas reales a `POST /api/sensor` desde WiFi, y luego mover persistencia a un backend durable.
+Conectar el ESP32 físicamente, probar que la web refleje lecturas reales y luego mover persistencia a un backend durable.
