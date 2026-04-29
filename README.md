@@ -2,9 +2,9 @@
 
 Autonomous Urban Regeneration Via Audio.
 
-Demo web + API local para visualizar el nodo ambiental AURA con lecturas de un ESP32 + DHT11.
+Demo web + API del nodo ambiental AURA, ahora montada sobre **Next.js** para desplegar limpio en **Vercel** y seguir creciendo con visualizaciones más ricas.
 
-## Qué incluye esta V1
+## Qué incluye esta versión
 
 - Landing visual para Bosques & Tech 2026
 - Panel de nodo en vivo con:
@@ -12,25 +12,44 @@ Demo web + API local para visualizar el nodo ambiental AURA con lecturas de un E
   - humedad
   - estado ambiental
   - estado online/offline
-- API local para recibir y servir lecturas del sensor
-- Fallback limpio: si no hay datos reales, el nodo aparece como desconectado
+- API `GET /api/sensor`
+- API `POST /api/sensor`
+- Estado inicial desconectado si todavía no hay lecturas reales
+- Base moderna con **Next.js App Router**
+
+## Stack
+
+- Next.js
+- React
+- TypeScript
 
 ## Estructura
 
-- `index.html` — landing y UI del nodo
-- `server.js` — servidor HTTP con frontend + API
-- `package.json` — script de arranque
+- `app/page.tsx` — landing y UI del nodo
+- `app/api/sensor/route.ts` — API route para lecturas del sensor
+- `lib/sensor-store.ts` — lógica de normalización y estado temporal
+- `app/globals.css` — estilos globales
 - `AURA_ARVI_contexto_inicial_para_agente.txt` — contexto conceptual del proyecto
 
-## Cómo correrlo
+## Desarrollo local
+
+Instala dependencias:
 
 ```bash
-npm start
+npm install
 ```
 
-Servidor local por defecto:
+Corre el proyecto:
 
-- `http://localhost:3000`
+```bash
+npm run dev
+```
+
+Build de producción:
+
+```bash
+npm run build
+```
 
 ## API
 
@@ -41,13 +60,13 @@ Ejemplo sin datos:
 
 ```json
 {
-  "online": false,
-  "hasData": false,
   "nodeId": "AURA-001",
   "temperature": null,
   "humidity": null,
   "state": "disconnected",
   "timestamp": null,
+  "online": false,
+  "hasData": false,
   "lastSeenMs": null
 }
 ```
@@ -91,6 +110,21 @@ curl -X POST http://localhost:3000/api/sensor \
   - `alert`
   - `disconnected`
 
+## Nota importante sobre Vercel
+
+La persistencia actual del sensor está en **memoria del runtime** para mantener el deploy simple y compatible con serverless.
+
+Eso significa que en Vercel:
+- **sí funciona** para demo y pruebas rápidas,
+- pero **no es persistencia durable** entre reinicios, escalado o cold starts.
+
+Para la siguiente versión conviene mover lecturas a:
+- Vercel KV
+- Upstash Redis
+- Supabase
+- Firebase
+- o una base/API dedicada
+
 ## Siguiente paso sugerido
 
-Conectar el sketch del ESP32 para enviar lecturas reales a `POST /api/sensor` desde WiFi.
+Conectar el sketch del ESP32 para enviar lecturas reales a `POST /api/sensor` desde WiFi, y luego mover persistencia a un backend durable.

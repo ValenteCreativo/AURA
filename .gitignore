@@ -1,2 +1,4 @@
-sensor-data.json
 node_modules/
+.next/
+out/
+.env*
