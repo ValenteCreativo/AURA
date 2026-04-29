@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AURA — Autonomous Urban Regeneration Via Audio</title>
+    <meta
+      name="description"
+      content="AURA es un nodo experimental de inteligencia ambiental que traduce señales del entorno en estados vivos."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              aura: {
+                bg: '#07130f',
+                panel: 'rgba(16, 34, 27, 0.72)',
+                line: 'rgba(127, 255, 195, 0.18)',
+                glow: '#6ee7b7',
+                warm: '#f59e0b',
+                alert: '#fb7185',
+                offline: '#94a3b8'
+              }
+            },
+            boxShadow: {
+              glow: '0 0 80px rgba(110, 231, 183, 0.15)'
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        background:
+          radial-gradient(circle at top, rgba(34, 197, 94, 0.14), transparent 30%),
+          radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.12), transparent 25%),
+          linear-gradient(180deg, #040b08 0%, #07130f 45%, #030805 100%);
+      }
+      .orb {
+        background:
+          radial-gradient(circle at 30% 30%, rgba(167, 243, 208, 0.95), rgba(34, 197, 94, 0.45) 28%, rgba(3, 120, 87, 0.18) 48%, rgba(2, 8, 6, 0.05) 70%),
+          radial-gradient(circle at 50% 50%, rgba(110, 231, 183, 0.14), transparent 60%);
+        box-shadow:
+          0 0 80px rgba(110, 231, 183, 0.18),
+          inset 0 0 40px rgba(255, 255, 255, 0.08);
+        animation: breathe 6s ease-in-out infinite;
+      }
+      .orb[data-state='alert'] {
+        background:
+          radial-gradient(circle at 30% 30%, rgba(254, 205, 211, 0.95), rgba(244, 63, 94, 0.42) 28%, rgba(127, 29, 29, 0.2) 48%, rgba(2, 8, 6, 0.05) 70%);
+      }
+      .orb[data-state='attention'] {
+        background:
+          radial-gradient(circle at 30% 30%, rgba(253, 230, 138, 0.95), rgba(245, 158, 11, 0.4) 28%, rgba(120, 53, 15, 0.18) 48%, rgba(2, 8, 6, 0.05) 70%);
+      }
+      .orb[data-state='balanced'] {
+        background:
+          radial-gradient(circle at 30% 30%, rgba(167, 243, 208, 0.95), rgba(34, 197, 94, 0.45) 28%, rgba(3, 120, 87, 0.18) 48%, rgba(2, 8, 6, 0.05) 70%),
+          radial-gradient(circle at 50% 50%, rgba(110, 231, 183, 0.14), transparent 60%);
+      }
+      .orb[data-state='disconnected'] {
+        background:
+          radial-gradient(circle at 30% 30%, rgba(226, 232, 240, 0.82), rgba(100, 116, 139, 0.38) 28%, rgba(51, 65, 85, 0.2) 48%, rgba(2, 8, 6, 0.05) 70%);
+        box-shadow:
+          0 0 70px rgba(148, 163, 184, 0.12),
+          inset 0 0 40px rgba(255, 255, 255, 0.05);
+      }
+      @keyframes breathe {
+        0%, 100% { transform: scale(0.96); }
+        50% { transform: scale(1.03); }
+      }
+      .grid-line {
+        background-image: linear-gradient(rgba(127,255,195,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(127,255,195,0.06) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-100 antialiased">
+    <div class="fixed inset-0 grid-line pointer-events-none"></div>
+
+    <main class="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-10 lg:px-10">
+      <section class="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:py-12">
+        <div class="space-y-6">
+          <p class="text-sm uppercase tracking-[0.35em] text-emerald-300/70">Bosques & Tech 2026 · Nodo experimental</p>
+          <h1 class="max-w-4xl text-5xl font-semibold leading-tight tracking-tight sm:text-6xl lg:text-7xl">AURA</h1>
+          <p class="max-w-2xl text-xl text-slate-300 sm:text-2xl">Inteligencia ambiental autónoma a través del sonido.</p>
+          <p class="max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
+            Un primer nodo experimental que traduce señales del entorno en estados vivos: equilibrio, atención y alerta. El bosque respira. El sistema escucha.
+          </p>
+
+          <div class="flex flex-wrap gap-3 pt-2 text-sm text-slate-300">
+            <span id="hero-node-badge" class="rounded-full border border-white/10 bg-white/5 px-4 py-2">Nodo esperando señal</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2">Temperatura + humedad</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2">GET/POST /api/sensor</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center">
+          <div id="orb" class="orb aspect-square w-full max-w-md rounded-full border border-white/10" data-state="disconnected"></div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <article class="rounded-3xl border border-white/10 bg-[rgba(16,34,27,0.72)] p-6 shadow-glow backdrop-blur">
+          <div class="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-[0.3em] text-emerald-300/60">Live Node</p>
+              <h2 class="mt-2 text-2xl font-medium">Señal ambiental recibida</h2>
+            </div>
+            <div id="online-chip" class="rounded-full border border-slate-300/20 bg-slate-300/10 px-3 py-1 text-xs text-slate-200">
+              <span id="online-dot" class="inline-block h-2 w-2 rounded-full bg-slate-300"></span>
+              <span id="online-label" class="ml-2">Nodo desconectado</span>
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-black/10 p-5">
+              <p class="text-sm text-slate-400">Temperatura actual</p>
+              <p id="temperature" class="mt-2 text-4xl font-semibold tracking-tight">--<span class="text-lg text-slate-400"> °C</span></p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/10 p-5">
+              <p class="text-sm text-slate-400">Humedad actual</p>
+              <p id="humidity" class="mt-2 text-4xl font-semibold tracking-tight">--<span class="text-lg text-slate-400"> %</span></p>
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-2xl border border-white/10 bg-black/10 p-5">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-sm text-slate-400">Estado ambiental</p>
+                <p id="status" class="mt-2 text-3xl font-semibold">Desconectado</p>
+              </div>
+              <span id="badge" class="rounded-full border px-3 py-1 text-sm border-slate-300/20 bg-slate-300/10 text-slate-100">Sin lecturas reales</span>
+            </div>
+            <p id="interpretation" class="mt-4 max-w-xl text-sm leading-7 text-slate-300">
+              AURA está listo para escuchar, pero todavía no ha recibido datos reales del ESP32.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
+              <p id="last-updated">Última lectura: sin datos</p>
+              <p id="node-id">Node ID: AURA-001</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="grid gap-6">
+          <article class="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.3em] text-emerald-300/60">Interpretación</p>
+            <h2 class="mt-2 text-2xl font-medium">Cómo lee AURA el entorno</h2>
+            <div class="mt-5 grid gap-4 md:grid-cols-3">
+              <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <p class="text-sm text-slate-400">Balanced</p>
+                <p class="mt-2 text-sm text-slate-300">Temperatura y humedad en un rango estable para el nodo.</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <p class="text-sm text-slate-400">Attention</p>
+                <p class="mt-2 text-sm text-slate-300">Sequedad, calor moderado o condiciones que requieren seguimiento.</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <p class="text-sm text-slate-400">Alert</p>
+                <p class="mt-2 text-sm text-slate-300">Estrés térmico o una combinación ambiental crítica.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.3em] text-emerald-300/60">API Contract</p>
+            <h2 class="mt-2 text-2xl font-medium">Endpoint del nodo</h2>
+            <div class="mt-5 space-y-4 text-sm text-slate-300">
+              <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <p class="font-medium text-slate-100">GET /api/sensor</p>
+                <p class="mt-2 text-slate-400">Devuelve la última lectura conocida y si el nodo sigue online.</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/10 p-4">
+                <p class="font-medium text-slate-100">POST /api/sensor</p>
+                <pre class="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-400">{
+  "nodeId": "AURA-001",
+  "temperature": 28.5,
+  "humidity": 31,
+  "state": "attention",
+  "timestamp": 1714410000000
+}</pre>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function derivePresentation(api) {
+        const state = api.state || 'disconnected';
+        const dictionary = {
+          balanced: {
+            title: 'Equilibrio',
+            badge: 'Condición estable',
+            text: 'La lectura indica condiciones ambientales estables. El entorno respira en equilibrio.',
+            tone: 'emerald'
+          },
+          attention: {
+            title: 'Atención',
+            badge: 'Seguimiento recomendado',
+            text: 'La señal sugiere un ambiente seco o con calor moderado. Conviene seguir monitoreando el nodo.',
+            tone: 'amber'
+          },
+          alert: {
+            title: 'Alerta',
+            badge: 'Estrés térmico',
+            text: 'La combinación de calor y sequedad indica una señal crítica para el entorno monitoreado.',
+            tone: 'rose'
+          },
+          disconnected: {
+            title: 'Desconectado',
+            badge: 'Sin lecturas reales',
+            text: 'AURA está listo para escuchar, pero todavía no ha recibido datos reales del ESP32.',
+            tone: 'slate'
+          }
+        };
+        return dictionary[state] || dictionary.disconnected;
+      }
+
+      function formatReading(value, unit, digits = 1) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+          return `--<span class="text-lg text-slate-400"> ${unit}</span>`;
+        }
+        return `${Number(value).toFixed(digits)}<span class="text-lg text-slate-400"> ${unit}</span>`;
+      }
+
+      function formatTimestamp(timestamp) {
+        if (!timestamp) return 'sin datos';
+        return new Date(timestamp).toLocaleString('es-MX', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+      }
+
+      function applyTone(element, tone) {
+        const tones = {
+          emerald: 'border-emerald-300/20 bg-emerald-300/10 text-emerald-100',
+          amber: 'border-amber-300/20 bg-amber-300/10 text-amber-100',
+          rose: 'border-rose-300/20 bg-rose-300/10 text-rose-100',
+          slate: 'border-slate-300/20 bg-slate-300/10 text-slate-100'
+        };
+        element.className = `rounded-full border px-3 py-1 text-sm ${tones[tone] || tones.slate}`;
+      }
+
+      function render(api) {
+        const presentation = derivePresentation(api);
+        const isOnline = Boolean(api.online);
+
+        document.getElementById('temperature').innerHTML = formatReading(api.temperature, '°C', 1);
+        document.getElementById('humidity').innerHTML = formatReading(api.humidity, '%', 0);
+        document.getElementById('status').textContent = presentation.title;
+        document.getElementById('interpretation').textContent = presentation.text;
+        document.getElementById('last-updated').textContent = `Última lectura: ${formatTimestamp(api.timestamp)}`;
+        document.getElementById('node-id').textContent = `Node ID: ${api.nodeId || 'AURA-001'}`;
+        document.getElementById('online-label').textContent = isOnline ? 'Nodo online' : 'Nodo desconectado';
+        document.getElementById('online-dot').className = `inline-block h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-300' : 'bg-slate-300'}`;
+
+        const onlineChip = document.getElementById('online-chip');
+        onlineChip.className = `rounded-full border px-3 py-1 text-xs ${isOnline ? 'border-emerald-400/20 bg-emerald-300/10 text-emerald-200' : 'border-slate-300/20 bg-slate-300/10 text-slate-200'}`;
+
+        const heroBadge = document.getElementById('hero-node-badge');
+        heroBadge.textContent = isOnline ? 'ESP32 activo' : 'Nodo esperando señal';
+        heroBadge.className = `rounded-full border px-4 py-2 ${isOnline ? 'border-emerald-400/20 bg-emerald-300/10 text-emerald-100' : 'border-white/10 bg-white/5 text-slate-300'}`;
+
+        const badge = document.getElementById('badge');
+        badge.textContent = presentation.badge;
+        applyTone(badge, presentation.tone);
+
+        document.getElementById('orb').dataset.state = api.state || 'disconnected';
+      }
+
+      async function loadSensorData() {
+        try {
+          const response = await fetch('/api/sensor', { cache: 'no-store' });
+          if (!response.ok) throw new Error('No se pudo leer /api/sensor');
+          const json = await response.json();
+          render(json);
+        } catch (error) {
+          render({
+            nodeId: 'AURA-001',
+            temperature: null,
+            humidity: null,
+            state: 'disconnected',
+            online: false,
+            timestamp: null
+          });
+        }
+      }
+
+      loadSensorData();
+      setInterval(loadSensorData, 5000);
+    </script>
+  </body>
+</html>
