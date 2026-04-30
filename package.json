@@ -1,22 +1,25 @@
 {
   "name": "aura-next",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "AURA — demo web y API para nodo ambiental con Next.js",
+  "description": "AURA — interfaz de inteligencia ambiental autónoma a través del sonido",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "framer-motion": "^11.11.17",
+    "lucide-react": "^0.460.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "recharts": "^2.13.3"
   },
   "devDependencies": {
-    "typescript": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "typescript": "latest"
   }
 }
