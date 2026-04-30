@@ -6,10 +6,16 @@ type Props = {
   height?: number;
   color?: string;
   intensity?: number;
+  analyser?: AnalyserNode | null;
 };
 
-export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 1 }: Props) {
+export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 1, analyser = null }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const analyserRef = useRef<AnalyserNode | null>(analyser);
+
+  useEffect(() => {
+    analyserRef.current = analyser;
+  }, [analyser]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,6 +26,7 @@ export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let raf = 0;
     let t = 0;
+    let timeBuf: Uint8Array<ArrayBuffer> | null = null;
 
     function resize() {
       if (!canvas) return;
@@ -32,7 +39,7 @@ export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 
     const obs = new ResizeObserver(resize);
     obs.observe(canvas);
 
-    function drawLine(amp: number, phase: number, alpha: number, lineColor: string) {
+    function drawSyntheticLine(amp: number, phase: number, alpha: number, lineColor: string) {
       if (!canvas || !ctx) return;
       const w = canvas.width;
       const h = canvas.height;
@@ -56,6 +63,28 @@ export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 
       ctx.globalAlpha = 1;
     }
 
+    function drawLiveLine(buf: Uint8Array<ArrayBuffer>, alpha: number, lineColor: string, amp: number) {
+      if (!canvas || !ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.beginPath();
+      const step = Math.max(1, Math.floor(buf.length / w));
+      const N = buf.length;
+      for (let x = 0; x < w; x++) {
+        const idx = Math.min(N - 1, Math.floor((x / w) * N));
+        const v = (buf[idx] - 128) / 128;
+        const y = h / 2 + v * (h / 2) * 0.85 * amp;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+        if (x % step !== 0) continue;
+      }
+      ctx.strokeStyle = lineColor;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 1.6 * dpr;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
     function draw() {
       if (!canvas || !ctx) return;
       const w = canvas.width;
@@ -63,11 +92,21 @@ export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 
       ctx.fillStyle = 'rgba(3, 7, 6, 0.18)';
       ctx.fillRect(0, 0, w, h);
 
-      const a = (h / 2) * 0.78 * intensity;
-      drawLine(a * 0.55, 0, 0.18, color);
-      drawLine(a * 0.7, 1.1, 0.32, color);
-      drawLine(a * 0.85, 2.4, 0.55, color);
-      drawLine(a, 0.4, 0.95, color);
+      const live = analyserRef.current;
+      if (live) {
+        if (!timeBuf || timeBuf.length !== live.fftSize) {
+          timeBuf = new Uint8Array(new ArrayBuffer(live.fftSize));
+        }
+        live.getByteTimeDomainData(timeBuf);
+        drawLiveLine(timeBuf, 0.32, color, intensity * 0.6);
+        drawLiveLine(timeBuf, 0.95, color, intensity);
+      } else {
+        const a = (h / 2) * 0.78 * intensity;
+        drawSyntheticLine(a * 0.55, 0, 0.18, color);
+        drawSyntheticLine(a * 0.7, 1.1, 0.32, color);
+        drawSyntheticLine(a * 0.85, 2.4, 0.55, color);
+        drawSyntheticLine(a, 0.4, 0.95, color);
+      }
 
       ctx.strokeStyle = 'rgba(255,255,255,0.04)';
       ctx.lineWidth = 1;

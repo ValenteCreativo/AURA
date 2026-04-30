@@ -23,9 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AURA — Inteligencia ambiental autónoma a través del sonido',
+  title: 'AURA 2.2 — Voxel observatory for urban bioacoustics',
   description:
-    'AURA es un nodo experimental de bioecoacústica y sensado urbano. Traduce señales del entorno en estados vivos: equilibrio, atención, alerta y regeneración.',
+    'AURA is a single-node observatory that turns one corner of the city into a four-channel signal: biophony, anthrophony, geophony and live thermohygro telemetry — visible as a Heerich-inspired voxel composition.',
   keywords: [
     'AURA',
     'bioecoacústica',

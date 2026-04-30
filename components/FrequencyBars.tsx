@@ -6,10 +6,16 @@ type Props = {
   height?: number;
   bars?: number;
   intensity?: number;
+  analyser?: AnalyserNode | null;
 };
 
-export default function FrequencyBars({ height = 180, bars = 56, intensity = 1 }: Props) {
+export default function FrequencyBars({ height = 180, bars = 56, intensity = 1, analyser = null }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const analyserRef = useRef<AnalyserNode | null>(analyser);
+
+  useEffect(() => {
+    analyserRef.current = analyser;
+  }, [analyser]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,6 +27,7 @@ export default function FrequencyBars({ height = 180, bars = 56, intensity = 1 }
     let raf = 0;
     let t = 0;
     const peaks = new Array(bars).fill(0);
+    let bins: Uint8Array<ArrayBuffer> | null = null;
 
     function resize() {
       if (!canvas) return;
@@ -42,17 +49,32 @@ export default function FrequencyBars({ height = 180, bars = 56, intensity = 1 }
       const gap = 2 * dpr;
       const barW = (w - gap * (bars - 1)) / bars;
 
+      const live = analyserRef.current;
+      if (live) {
+        if (!bins || bins.length !== live.frequencyBinCount) {
+          bins = new Uint8Array(new ArrayBuffer(live.frequencyBinCount));
+        }
+        live.getByteFrequencyData(bins);
+      }
+
       for (let i = 0; i < bars; i++) {
         const f = i / (bars - 1);
-        const lf = Math.exp(-Math.pow((f - 0.16) / 0.1, 2));
-        const mf = Math.exp(-Math.pow((f - 0.45) / 0.13, 2));
-        const hf = Math.exp(-Math.pow((f - 0.78) / 0.09, 2));
+        let v: number;
+        if (live && bins) {
+          const N = bins.length;
+          const idx = Math.min(N - 1, Math.floor(Math.pow(f, 1.6) * N));
+          v = (bins[idx] / 255) * (0.85 + intensity * 0.4);
+        } else {
+          const lf = Math.exp(-Math.pow((f - 0.16) / 0.1, 2));
+          const mf = Math.exp(-Math.pow((f - 0.45) / 0.13, 2));
+          const hf = Math.exp(-Math.pow((f - 0.78) / 0.09, 2));
 
-        const wob = Math.sin(t * 1.2 + i * 0.32) * 0.5 + 0.5;
-        const wob2 = Math.sin(t * 0.6 + i * 0.13 + 1.7) * 0.5 + 0.5;
-        let v = lf * (0.4 + wob * 0.6) + mf * (0.35 + wob2 * 0.65) + hf * (0.55 + wob * 0.45);
-        v += Math.random() * 0.1;
-        v *= 0.45 + intensity * 0.6;
+          const wob = Math.sin(t * 1.2 + i * 0.32) * 0.5 + 0.5;
+          const wob2 = Math.sin(t * 0.6 + i * 0.13 + 1.7) * 0.5 + 0.5;
+          v = lf * (0.4 + wob * 0.6) + mf * (0.35 + wob2 * 0.65) + hf * (0.55 + wob * 0.45);
+          v += Math.random() * 0.1;
+          v *= 0.45 + intensity * 0.6;
+        }
         v = Math.max(0.04, Math.min(1, v));
 
         peaks[i] = Math.max(peaks[i] * 0.92, v);

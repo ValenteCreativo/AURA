@@ -4,17 +4,16 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/AuroraBackground';
-import Spectrogram from '@/components/Spectrogram';
-import Waveform from '@/components/Waveform';
-import FrequencyBars from '@/components/FrequencyBars';
-import RadialMeter from '@/components/RadialMeter';
-import PolarSignature from '@/components/PolarSignature';
-import NodeConstellation from '@/components/NodeConstellation';
+import ChannelDeck from '@/components/ChannelDeck';
+import ContextPanel from '@/components/ContextPanel';
+import MicCapsule from '@/components/MicCapsule';
 import Marquee from '@/components/Marquee';
-import { ACOUSTIC_LAYERS, generate24h } from '@/lib/history-mock';
+import { useMicAnalyser } from '@/lib/mic-analyser';
+import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
+import type { VoxelChannel } from '@/components/VoxelObservatory';
 
-const SensorOrb3D = dynamic(() => import('@/components/SensorOrb3D'), {
+const VoxelObservatory = dynamic(() => import('@/components/VoxelObservatory'), {
   ssr: false,
   loading: () => null
 });
@@ -61,7 +60,9 @@ function pad(n: number) {
 export default function HomePage() {
   const [sensor, setSensor] = useState<SensorApiResponse>(DISCONNECTED);
   const [now, setNow] = useState<number>(() => Date.now());
+  const [activeChannel, setActiveChannel] = useState<VoxelChannel | null>(null);
 
+  const mic = useMicAnalyser(1024);
   const history = useMemo(() => generate24h(42), []);
   const acousticNow = history[history.length - 1];
 
@@ -91,54 +92,81 @@ export default function HomePage() {
   const intensity = useMemo(() => {
     const t = sensor.temperature ?? 22;
     const h = sensor.humidity ?? 60;
-    return Math.min(1.4, 0.55 + Math.abs(t - 22) / 18 + Math.abs(60 - h) / 80);
-  }, [sensor.temperature, sensor.humidity]);
+    const base = 0.55 + Math.abs(t - 22) / 18 + Math.abs(60 - h) / 80;
+    return Math.min(1.6, base + mic.level * 0.6);
+  }, [sensor.temperature, sensor.humidity, mic.level]);
 
   const ndsi = acousticNow.ndsi;
+  const micActive = mic.status === 'granted';
+
+  const channelLevels = useMemo(() => {
+    const t = sensor.temperature ?? 22;
+    const h = sensor.humidity ?? 60;
+    const sensorLoad = Math.min(1, Math.abs(t - 22) / 18 + Math.abs(60 - h) / 80);
+    if (micActive) {
+      return {
+        biophony: clamp(mic.bands.high * 1.15),
+        anthrophony: clamp(mic.bands.mid * 1.1),
+        geophony: clamp(mic.bands.low * 1.2),
+        sensor: clamp(0.35 + sensorLoad * 0.6)
+      };
+    }
+    return {
+      biophony: clamp(acousticNow.biophony / 100),
+      anthrophony: clamp(acousticNow.anthrophony / 100),
+      geophony: clamp(acousticNow.geophony / 100),
+      sensor: clamp(0.35 + sensorLoad * 0.55)
+    };
+  }, [mic.bands, micActive, acousticNow, sensor.temperature, sensor.humidity]);
 
   const tickerItems = [
-    `node aura-001`,
+    'AURA · 2.2 · single-node observatory',
+    `node ${sensor.nodeId}`,
     `t ${formatNumber(sensor.temperature)} °c`,
     `rh ${formatNumber(sensor.humidity, 0)} %`,
     `state ${STATE_LABEL[sensor.state]}`,
     `ndsi ${ndsi.toFixed(2)}`,
-    `biophony ${acousticNow.biophony.toFixed(0)}%`,
-    `anthropophony ${acousticNow.anthrophony.toFixed(0)}%`,
-    `geophony ${acousticNow.geophony.toFixed(0)}%`,
-    `mesh 6 nodes · 1 live`,
-    `agentic layer · stand-by`,
-    `bernie krause · soundscape ecology`,
-    `depin · data-as-a-service`
+    `bio ${(channelLevels.biophony * 100).toFixed(0)}%`,
+    `ant ${(channelLevels.anthrophony * 100).toFixed(0)}%`,
+    `geo ${(channelLevels.geophony * 100).toFixed(0)}%`,
+    micActive ? 'mic · live' : 'mic · standby (mock signal)',
+    'bernie krause · soundscape ecology',
+    'depin · data-as-a-service'
   ];
+
+  const heroEyebrow = micActive ? 'live · listening to your room' : 'live · simulated bioacoustics';
 
   return (
     <div style={styles.shell}>
       <AuroraBackground />
 
       <style>{`
+        body { overflow: hidden; }
         @media (max-width: 1180px) {
-          .aura-grid-hero,
-          .aura-grid-three,
-          .aura-grid-two {
+          body { overflow: auto; }
+          .aura-cockpit-grid {
             grid-template-columns: 1fr !important;
+            grid-template-rows: auto auto auto !important;
+            height: auto !important;
           }
-          .aura-grid-meters {
-            grid-template-columns: repeat(2, 1fr) !important;
+          .aura-stage {
+            min-height: 60vh !important;
           }
-        }
-        @media (max-width: 720px) {
-          .aura-grid-meters {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 10px !important;
+          .aura-shell {
+            height: auto !important;
+            min-height: 100vh !important;
           }
-          .aura-readout-row { flex-wrap: wrap !important; }
         }
       `}</style>
 
-      <main style={styles.main}>
+      <main className="aura-shell" style={styles.main}>
         <header style={styles.topbar}>
           <div style={styles.topbarLeft}>
-            <span className="aura-tag">AURA / 2.1</span>
+            <span style={styles.logo}>
+              <span style={styles.logoMark}>◐</span>
+              <span style={styles.logoText}>AURA</span>
+              <span className="aura-mono" style={styles.logoVer}>2.2</span>
+            </span>
             <span className="aura-tag mute">{sensor.nodeId}</span>
             <span
               className={`aura-tag ${sensor.state === 'alert' ? 'alert' : sensor.state === 'attention' ? 'warn' : sensor.state === 'balanced' ? '' : 'mute'}`}
@@ -155,6 +183,7 @@ export default function HomePage() {
               />
               {STATE_LABEL[sensor.state]}
             </span>
+            {micActive && <span className="aura-tag">mic · listening</span>}
           </div>
           <div style={styles.topbarRight}>
             <span className="aura-mono" style={styles.coord}>19.4326° N</span>
@@ -163,202 +192,98 @@ export default function HomePage() {
           </div>
         </header>
 
-        <section className="aura-grid-hero" style={styles.hero}>
-          <div style={styles.heroLeft}>
-            <span className="aura-tag">live · bioacoustic intelligence</span>
-            <h1 style={styles.heroTitle}>
-              the city <span className="aura-serif" style={{ fontStyle: 'italic', color: '#b8ffd8' }}>breathes</span>.
-              <br />
-              we listen.
-            </h1>
-            <div className="aura-readout-row" style={styles.heroReadouts}>
+        <div className="aura-cockpit-grid" style={styles.grid}>
+          <aside style={styles.railLeft}>
+            <section style={styles.heroBlock}>
+              <span className="aura-mono" style={styles.heroEyebrow}>{heroEyebrow}</span>
+              <h1 style={styles.heroTitle}>
+                listening<br />
+                to a city<br />
+                <span className="aura-serif" style={styles.heroAccent}>that breathes</span>
+              </h1>
+              <p style={styles.heroLede}>
+                AURA is a single sensor node that turns one corner of the city into a four-channel observatory:
+                biophony, anthrophony, geophony and live thermohygro telemetry. Each voxel below is a slice of
+                that signal — touch one to focus the data.
+              </p>
+            </section>
+
+            <ChannelDeck
+              active={activeChannel}
+              onSelect={setActiveChannel}
+              channelLevels={channelLevels}
+            />
+
+            <div style={styles.miniReadouts}>
               <Readout label="t" value={formatNumber(sensor.temperature)} unit="°C" color="#6ee7b7" />
               <Readout label="rh" value={formatNumber(sensor.humidity, 0)} unit="%" color="#7dd3fc" />
               <Readout label="ndsi" value={ndsi.toFixed(2)} unit="" color="#c4b5fd" />
-              <Readout label="seen" value={sensor.timestamp ? formatClock(sensor.timestamp).slice(0, 5) : '--:--'} unit="" color="#fbbf24" />
             </div>
-          </div>
+          </aside>
 
-          <div className="aura-frame" style={styles.heroStage}>
-            <span className="aura-corner tl" />
-            <span className="aura-corner tr" />
-            <span className="aura-corner bl" />
-            <span className="aura-corner br" />
-            <div style={styles.heroStageTop}>
-              <span className="aura-mono" style={styles.miniLabel}>ECOSYSTEM ORB · {STATE_LABEL[sensor.state]}</span>
-              <span className="aura-mono" style={styles.miniLabel}>x {(intensity).toFixed(2)} amp</span>
+          <section className="aura-stage" style={styles.stage}>
+            <div style={styles.stageFrame} className="aura-frame">
+              <span className="aura-corner tl" />
+              <span className="aura-corner tr" />
+              <span className="aura-corner bl" />
+              <span className="aura-corner br" />
+
+              <div style={styles.stageOverlayTop}>
+                <span className="aura-mono" style={styles.miniLabel}>
+                  voxel observatory · {activeChannel ? activeChannel.toUpperCase() : 'ALL CHANNELS'}
+                </span>
+                <span className="aura-mono" style={styles.miniLabel}>
+                  amp x {intensity.toFixed(2)}
+                </span>
+              </div>
+
+              <div style={styles.canvasHost}>
+                <VoxelObservatory
+                  active={activeChannel}
+                  onSelect={(c) => setActiveChannel((curr) => (curr === c ? null : c))}
+                  channelLevels={channelLevels}
+                  micAnalyser={mic.analyser}
+                  pulse={mic.level}
+                />
+              </div>
+
+              <div style={styles.stageOverlayBottom}>
+                <Quadrant label="biophony" hint="NE" color="#6ee7b7" active={activeChannel === 'biophony'} onClick={() => setActiveChannel((c) => c === 'biophony' ? null : 'biophony')} />
+                <Quadrant label="sensor" hint="NW" color="#c4b5fd" active={activeChannel === 'sensor'} onClick={() => setActiveChannel((c) => c === 'sensor' ? null : 'sensor')} />
+                <Quadrant label="geophony" hint="SE" color="#7dd3fc" active={activeChannel === 'geophony'} onClick={() => setActiveChannel((c) => c === 'geophony' ? null : 'geophony')} />
+                <Quadrant label="anthrophony" hint="SW" color="#fb923c" active={activeChannel === 'anthrophony'} onClick={() => setActiveChannel((c) => c === 'anthrophony' ? null : 'anthrophony')} />
+              </div>
             </div>
-            <div style={styles.canvasHost}>
-              <SensorOrb3D
-                temperature={sensor.temperature}
-                humidity={sensor.humidity}
-                state={sensor.state}
+          </section>
+
+          <aside style={styles.railRight}>
+            <div className="aura-frame" style={styles.contextFrame}>
+              <ContextPanel
+                active={activeChannel}
+                sensor={sensor}
+                history={history}
+                intensity={intensity}
+                ndsi={ndsi}
+                micAnalyser={mic.analyser}
+                micActive={micActive}
               />
             </div>
-            <div style={styles.heroStageBottom}>
-              <RingTick label="bio" value={acousticNow.biophony / 100} color="#6ee7b7" />
-              <RingTick label="ant" value={acousticNow.anthrophony / 100} color="#fb923c" />
-              <RingTick label="geo" value={acousticNow.geophony / 100} color="#7dd3fc" />
-            </div>
-          </div>
-        </section>
+            <MicCapsule mic={mic} />
+          </aside>
+        </div>
 
-        <Marquee items={tickerItems} speed={48} />
-
-        <section style={styles.spectroWrap} className="aura-frame">
-          <div style={styles.sectionRow}>
-            <div>
-              <span className="aura-mono" style={styles.eyebrow}>spectrogram · live emulation</span>
-              <h2 style={styles.subTitle}>0.06 – 11 kHz</h2>
-            </div>
-            <div style={styles.sectionLegend}>
-              {ACOUSTIC_LAYERS.map((layer) => (
-                <span key={layer.id} style={styles.legendChip}>
-                  <span style={{ ...styles.legendSwatch, background: layer.color }} />
-                  <span>{layer.name.toLowerCase()}</span>
-                  <span className="aura-mono" style={styles.legendRange}>{layer.range}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-          <Spectrogram height={260} intensity={intensity} speed={1 + intensity * 0.6} />
-        </section>
-
-        <section className="aura-grid-two" style={styles.twoCol}>
-          <div className="aura-frame" style={styles.panel}>
-            <div style={styles.sectionRow}>
-              <div>
-                <span className="aura-mono" style={styles.eyebrow}>waveform · 5 s window</span>
-                <h2 style={styles.subTitle}>signal envelope</h2>
-              </div>
-              <span className="aura-tag mute">x{(0.6 + intensity * 0.8).toFixed(2)}</span>
-            </div>
-            <Waveform color={stateColor} intensity={Math.min(1.2, 0.7 + intensity * 0.6)} height={150} />
-            <div className="aura-grid-meters" style={styles.meterGrid}>
-              <div style={styles.meterCell}>
-                <RadialMeter
-                  label="temp"
-                  value={sensor.temperature ?? 0}
-                  min={-5}
-                  max={45}
-                  unit="°C"
-                  color="#6ee7b7"
-                  size={150}
-                />
-              </div>
-              <div style={styles.meterCell}>
-                <RadialMeter
-                  label="hum"
-                  value={sensor.humidity ?? 0}
-                  min={0}
-                  max={100}
-                  unit="%"
-                  color="#7dd3fc"
-                  size={150}
-                />
-              </div>
-              <div style={styles.meterCell}>
-                <RadialMeter
-                  label="ndsi"
-                  value={(ndsi + 1) * 50}
-                  min={0}
-                  max={100}
-                  unit=""
-                  color="#c4b5fd"
-                  size={150}
-                />
-              </div>
-              <div style={styles.meterCell}>
-                <RadialMeter
-                  label="bio"
-                  value={acousticNow.biophony}
-                  min={0}
-                  max={100}
-                  unit="%"
-                  color="#fbbf24"
-                  size={150}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="aura-frame" style={styles.panel}>
-            <div style={styles.sectionRow}>
-              <div>
-                <span className="aura-mono" style={styles.eyebrow}>frequency bands · 60 hz – 11 khz</span>
-                <h2 style={styles.subTitle}>biophony / anthropophony / geophony</h2>
-              </div>
-            </div>
-            <FrequencyBars height={220} intensity={intensity} />
-            <div style={{ marginTop: 18 }}>
-              <PolarSignature data={history} size={360} />
-            </div>
-            <div style={styles.legendStack}>
-              {ACOUSTIC_LAYERS.map((layer) => (
-                <div key={layer.id} style={styles.legendStackRow}>
-                  <span style={{ ...styles.legendDot, background: layer.color }} />
-                  <span style={{ color: layer.color, fontFamily: 'var(--font-mono), monospace', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-                    {layer.name}
-                  </span>
-                  <span className="aura-mono" style={{ color: 'rgba(220,235,225,0.5)', fontSize: 11 }}>
-                    {layer.range}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="aura-grid-two" style={styles.twoCol}>
-          <div className="aura-frame" style={styles.panel}>
-            <div style={styles.sectionRow}>
-              <div>
-                <span className="aura-mono" style={styles.eyebrow}>mesh · constellation</span>
-                <h2 style={styles.subTitle}>distributed listening</h2>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <span className="aura-tag">live · 1</span>
-                <span className="aura-tag warn">soon · 1</span>
-                <span className="aura-tag mute">idea · 4</span>
-              </div>
-            </div>
-            <NodeConstellation height={360} liveState={sensor.state} />
-          </div>
-
-          <div className="aura-frame" style={styles.panel}>
-            <div style={styles.sectionRow}>
-              <div>
-                <span className="aura-mono" style={styles.eyebrow}>signal · 24h trace</span>
-                <h2 style={styles.subTitle}>thermohygro & acoustic flow</h2>
-              </div>
-              <span className="aura-tag mute">{history.length} samples</span>
-            </div>
-            <SignalLanes data={history} />
-          </div>
-        </section>
-
-        <footer style={styles.footer}>
-          <div style={styles.footerCol}>
-            <span className="aura-mono" style={styles.eyebrow}>aura · 2.1</span>
-            <p style={styles.footerCopy}>
-              autonomous urban regeneration via audio. <br />
-              depin + data-as-a-service.
-            </p>
-          </div>
-          <div style={styles.footerCol}>
-            <span className="aura-mono" style={styles.eyebrow}>stack</span>
-            <p style={styles.footerCopy}>
-              esp32 / dht11 → next.js / r3f → agentic layer.
-            </p>
-          </div>
-          <div style={styles.footerCol}>
-            <span className="aura-mono" style={styles.eyebrow}>thesis</span>
-            <p style={styles.footerCopy}>rembu · sen · aona · arvi · aura.</p>
+        <footer style={styles.dock}>
+          <div style={styles.dockMarquee}>
+            <Marquee items={tickerItems} speed={52} />
           </div>
         </footer>
       </main>
     </div>
   );
+}
+
+function clamp(v: number) {
+  return Math.max(0, Math.min(1, v));
 }
 
 function Readout({
@@ -381,117 +306,56 @@ function Readout({
   );
 }
 
-function RingTick({
+function Quadrant({
   label,
-  value,
-  color
+  hint,
+  color,
+  active,
+  onClick
 }: {
   label: string;
-  value: number;
+  hint: string;
   color: string;
+  active: boolean;
+  onClick: () => void;
 }) {
-  const v = Math.max(0, Math.min(1, value));
-  const r = 22;
-  const c = 2 * Math.PI * r;
   return (
-    <div style={styles.ringTick}>
-      <svg width={56} height={56} viewBox="0 0 56 56">
-        <circle cx={28} cy={28} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={3} />
-        <circle
-          cx={28}
-          cy={28}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={3}
-          strokeDasharray={`${c * v} ${c}`}
-          strokeLinecap="round"
-          transform="rotate(-90 28 28)"
-          style={{ filter: `drop-shadow(0 0 6px ${color}88)` }}
-        />
-      </svg>
-      <div style={styles.ringTickLabel}>
-        <span style={{ color, fontSize: 10, fontFamily: 'var(--font-mono), monospace', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-          {label}
-        </span>
-        <strong style={{ color: '#f1fff5', fontSize: 14 }}>{Math.round(v * 100)}</strong>
-      </div>
-    </div>
-  );
-}
-
-function SignalLanes({ data }: { data: ReturnType<typeof generate24h> }) {
-  const lanes = [
-    { key: 'temperature' as const, label: 'temp', color: '#6ee7b7', unit: '°C' },
-    { key: 'humidity' as const, label: 'rh', color: '#7dd3fc', unit: '%' },
-    { key: 'biophony' as const, label: 'bio', color: '#fbbf24', unit: '' },
-    { key: 'anthrophony' as const, label: 'ant', color: '#fb923c', unit: '' },
-    { key: 'geophony' as const, label: 'geo', color: '#a78bfa', unit: '' }
-  ];
-
-  const w = 100;
-  const laneH = 28;
-
-  return (
-    <div style={{ display: 'grid', gap: 8 }}>
-      {lanes.map((lane) => {
-        const values = data.map((d) => d[lane.key]);
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const span = Math.max(0.001, max - min);
-        const baseY = laneH * 0.92;
-        const peakY = laneH * 0.1;
-        const path = values
-          .map((v, i) => {
-            const x = (i / (values.length - 1)) * w;
-            const norm = (v - min) / span;
-            const y = baseY + (peakY - baseY) * norm;
-            return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
-          })
-          .join(' ');
-        const fill = `${path} L${w},${baseY} L0,${baseY} Z`;
-        const last = data[data.length - 1][lane.key];
-
-        return (
-          <div key={lane.key} style={styles.signalLaneRow}>
-            <div style={styles.signalLaneLabelInline}>
-              <span style={{ color: lane.color, fontFamily: 'var(--font-mono), monospace', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-                {lane.label}
-              </span>
-              <span style={{ color: 'rgba(220,235,225,0.5)', fontFamily: 'var(--font-mono), monospace', fontSize: 10 }}>
-                {last.toFixed(1)}
-                {lane.unit}
-              </span>
-            </div>
-            <svg
-              viewBox={`0 0 ${w} ${laneH}`}
-              preserveAspectRatio="none"
-              style={{ width: '100%', height: 64, display: 'block', flex: 1 }}
-            >
-              <line x1={0} y1={baseY} x2={w} y2={baseY} stroke="rgba(255,255,255,0.06)" strokeWidth={0.15} />
-              <path d={fill} fill={lane.color} fillOpacity={0.16} />
-              <path d={path} fill="none" stroke={lane.color} strokeWidth={0.7} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-            </svg>
-          </div>
-        );
-      })}
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        ...styles.quadrantBtn,
+        borderColor: active ? color : 'rgba(255,255,255,0.1)',
+        color: active ? color : 'rgba(220,235,225,0.6)',
+        background: active
+          ? `linear-gradient(120deg, ${color}22, transparent)`
+          : 'rgba(255,255,255,0.02)',
+        boxShadow: active ? `inset 0 0 0 1px ${color}55` : 'none'
+      }}
+    >
+      <span style={{ ...styles.quadrantHint, color }}>{hint}</span>
+      <span style={styles.quadrantLabel}>{label}</span>
+    </button>
   );
 }
 
 const styles: Record<string, CSSProperties> = {
   shell: {
     position: 'relative',
-    minHeight: '100vh'
+    width: '100%',
+    height: '100vh',
+    overflow: 'hidden'
   },
   main: {
     position: 'relative',
     zIndex: 1,
-    width: 'min(1480px, calc(100% - 32px))',
+    width: 'min(1640px, calc(100% - 32px))',
     margin: '0 auto',
-    padding: '24px 0 64px',
+    padding: '14px 0 12px',
     display: 'grid',
-    gap: 22
+    gridTemplateRows: 'auto 1fr auto',
+    gap: 12,
+    height: '100vh'
   },
   topbar: {
     display: 'flex',
@@ -499,11 +363,33 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     gap: 12,
     flexWrap: 'wrap',
-    padding: '10px 0',
+    padding: '6px 0 10px',
     borderBottom: '1px solid rgba(255,255,255,0.06)'
   },
   topbarLeft: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
   topbarRight: { display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' },
+  logo: {
+    display: 'inline-flex',
+    alignItems: 'baseline',
+    gap: 8,
+    paddingRight: 14,
+    borderRight: '1px solid rgba(255,255,255,0.08)'
+  },
+  logoMark: {
+    fontSize: 18,
+    color: '#6ee7b7',
+    textShadow: '0 0 14px rgba(110,231,183,0.55)'
+  },
+  logoText: {
+    fontSize: 16,
+    letterSpacing: '0.32em',
+    color: '#f4fff8'
+  },
+  logoVer: {
+    fontSize: 10,
+    color: 'rgba(220,235,225,0.55)',
+    letterSpacing: '0.2em'
+  },
   coord: {
     color: 'rgba(220,235,225,0.55)',
     fontSize: 11,
@@ -514,68 +400,102 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 13,
     letterSpacing: '0.22em'
   },
-  hero: {
+  grid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 0.85fr) minmax(0, 1.15fr)',
-    gap: 22,
-    alignItems: 'stretch'
+    gridTemplateColumns: 'minmax(280px, 22%) minmax(0, 1fr) minmax(320px, 26%)',
+    gap: 14,
+    height: '100%',
+    minHeight: 0
   },
-  heroLeft: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    gap: 28,
-    padding: '12px 0'
+  railLeft: {
+    display: 'grid',
+    gridTemplateRows: 'auto auto auto',
+    gap: 14,
+    minHeight: 0,
+    overflowY: 'auto',
+    paddingRight: 4
+  },
+  railRight: {
+    display: 'grid',
+    gridTemplateRows: 'minmax(0, 1fr) auto',
+    gap: 12,
+    minHeight: 0
+  },
+  heroBlock: {
+    display: 'grid',
+    gap: 12
+  },
+  heroEyebrow: {
+    fontSize: 10,
+    letterSpacing: '0.32em',
+    textTransform: 'uppercase',
+    color: '#6ee7b7'
   },
   heroTitle: {
     margin: 0,
-    fontSize: 'clamp(3.6rem, 9vw, 8rem)',
-    lineHeight: 0.94,
-    letterSpacing: '-0.06em',
+    fontSize: 'clamp(2.4rem, 4.4vw, 4rem)',
+    lineHeight: 0.95,
+    letterSpacing: '-0.045em',
     fontWeight: 600,
     color: '#f4fff8'
   },
-  heroReadouts: {
-    display: 'flex',
-    gap: 12,
-    flexWrap: 'wrap'
+  heroAccent: {
+    fontStyle: 'italic',
+    color: '#b8ffd8'
+  },
+  heroLede: {
+    margin: 0,
+    fontSize: 13,
+    lineHeight: 1.55,
+    color: 'rgba(220,235,225,0.72)',
+    maxWidth: '38ch'
+  },
+  miniReadouts: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gap: 8
   },
   readout: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 4,
-    padding: '14px 18px',
-    borderRadius: 14,
+    gap: 2,
+    padding: '10px 12px',
+    borderRadius: 12,
     border: '1px solid rgba(255,255,255,0.07)',
     background: 'rgba(255,255,255,0.025)',
-    minWidth: 110
+    minWidth: 0
   },
   readoutLabel: {
     fontFamily: 'var(--font-mono), monospace',
-    fontSize: 10,
+    fontSize: 9,
     letterSpacing: '0.28em',
     textTransform: 'uppercase'
   },
   readoutValue: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 600,
     color: '#f1fff5',
     letterSpacing: '-0.03em'
   },
   readoutUnit: {
     fontFamily: 'var(--font-mono), monospace',
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(220,235,225,0.5)'
   },
-  heroStage: {
-    position: 'relative',
-    minHeight: 540,
-    padding: 22,
+  stage: {
     display: 'grid',
-    gridTemplateRows: 'auto minmax(0,1fr) auto',
-    gap: 14
+    minHeight: 0
   },
-  heroStageTop: {
+  stageFrame: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    display: 'grid',
+    gridTemplateRows: 'auto 1fr auto',
+    padding: 18,
+    minHeight: 0
+  },
+  stageOverlayTop: {
     display: 'flex',
     justifyContent: 'space-between',
     gap: 12,
@@ -588,156 +508,45 @@ const styles: Record<string, CSSProperties> = {
     position: 'relative',
     width: '100%',
     height: '100%',
-    minHeight: 380
+    minHeight: 0
   },
-  heroStageBottom: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    gap: 14,
-    padding: '6px 12px',
-    borderTop: '1px solid rgba(255,255,255,0.06)'
-  },
-  ringTick: {
-    position: 'relative',
-    width: 56,
-    height: 56,
-    display: 'grid',
-    placeItems: 'center'
-  },
-  ringTickLabel: {
-    position: 'absolute',
-    inset: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  spectroWrap: {
-    padding: 22,
-    display: 'grid',
-    gap: 16
-  },
-  sectionRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 16,
-    flexWrap: 'wrap'
-  },
-  sectionLegend: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 14
-  },
-  legendChip: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    fontSize: 12,
-    color: 'rgba(220,235,225,0.7)',
-    fontFamily: 'var(--font-mono), monospace',
-    letterSpacing: '0.14em'
-  },
-  legendSwatch: {
-    display: 'inline-block',
-    width: 10,
-    height: 10,
-    borderRadius: 999
-  },
-  legendRange: {
-    color: 'rgba(220,235,225,0.4)',
-    fontSize: 11
-  },
-  eyebrow: {
-    fontSize: 11,
-    letterSpacing: '0.32em',
-    textTransform: 'uppercase',
-    color: '#6ee7b7',
-    opacity: 0.85
-  },
-  subTitle: {
-    margin: '8px 0 0',
-    fontSize: 'clamp(1.4rem, 2.4vw, 2rem)',
-    lineHeight: 1.1,
-    fontWeight: 600,
-    letterSpacing: '-0.03em',
-    color: '#f4fff8'
-  },
-  twoCol: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: 22
-  },
-  panel: {
-    padding: 22,
-    display: 'grid',
-    gap: 18
-  },
-  meterGrid: {
+  stageOverlayBottom: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-    gap: 14,
-    marginTop: 6
-  },
-  meterCell: {
-    display: 'grid',
-    placeItems: 'center',
-    padding: 10,
-    borderRadius: 18,
-    border: '1px solid rgba(255,255,255,0.05)',
-    background: 'rgba(255,255,255,0.02)'
-  },
-  legendStack: {
-    display: 'grid',
     gap: 8,
-    padding: '14px 16px',
-    borderRadius: 16,
-    border: '1px solid rgba(255,255,255,0.05)',
-    background: 'rgba(255,255,255,0.025)'
+    paddingTop: 10,
+    borderTop: '1px solid rgba(255,255,255,0.06)'
   },
-  legendStackRow: {
-    display: 'flex',
-    gap: 14,
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    boxShadow: '0 0 10px currentColor'
-  },
-  signalLaneRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '8px 12px',
-    borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.05)',
-    background: 'rgba(255,255,255,0.02)'
-  },
-  signalLaneLabelInline: {
-    display: 'flex',
-    flexDirection: 'column',
+  quadrantBtn: {
+    appearance: 'none',
+    cursor: 'pointer',
+    padding: '8px 10px',
+    borderRadius: 10,
+    border: '1px solid',
+    display: 'grid',
     gap: 2,
-    minWidth: 70
+    textAlign: 'left',
+    transition: 'all 0.18s ease'
   },
-  footer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: 22,
-    padding: '32px 0 8px',
-    borderTop: '1px solid rgba(255,255,255,0.06)',
-    color: 'rgba(220,235,225,0.6)'
+  quadrantHint: {
+    fontFamily: 'var(--font-mono), monospace',
+    fontSize: 9,
+    letterSpacing: '0.28em',
+    textTransform: 'uppercase'
   },
-  footerCol: {
-    display: 'grid',
-    gap: 8
+  quadrantLabel: {
+    fontSize: 12,
+    letterSpacing: '0.04em'
   },
-  footerCopy: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.6,
-    color: 'rgba(220,235,225,0.7)'
+  contextFrame: {
+    minHeight: 0,
+    overflow: 'hidden',
+    display: 'grid'
+  },
+  dock: {
+    display: 'grid'
+  },
+  dockMarquee: {
+    width: '100%'
   }
 };
