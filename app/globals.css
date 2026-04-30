@@ -137,6 +137,123 @@ select {
   61%, 100% { opacity: 0.25; }
 }
 
+@keyframes aura-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes aura-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes aura-flicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+  72% { opacity: 0.55; }
+}
+
+.aura-marquee {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-block: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(110, 231, 183, 0.04), rgba(125, 211, 252, 0.04));
+  padding: 12px 0;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.aura-marquee-track {
+  display: inline-flex;
+  gap: 56px;
+  white-space: nowrap;
+  animation: aura-marquee linear infinite;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(220, 235, 225, 0.7);
+}
+
+.aura-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.aura-marquee-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--moss);
+  box-shadow: 0 0 14px var(--moss);
+}
+
+.aura-frame {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+
+.aura-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 40%),
+    radial-gradient(120% 70% at 100% 0%, rgba(110, 231, 183, 0.08), transparent 60%);
+  border-radius: inherit;
+}
+
+.aura-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(110, 231, 183, 0.5);
+  pointer-events: none;
+}
+.aura-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+.aura-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+.aura-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+.aura-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+.aura-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(110, 231, 183, 0.25);
+  background: rgba(110, 231, 183, 0.08);
+  color: #b8ffd8;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.aura-tag.warn {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fde68a;
+}
+
+.aura-tag.alert {
+  border-color: rgba(251, 113, 133, 0.3);
+  background: rgba(251, 113, 133, 0.1);
+  color: #fecaca;
+}
+
+.aura-tag.mute {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(220, 235, 225, 0.7);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

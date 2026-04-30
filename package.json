@@ -9,17 +9,21 @@
     "start": "next start"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.460.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "recharts": "^2.13.3"
+    "recharts": "^2.13.3",
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/three": "^0.184.0",
     "typescript": "latest"
   }
 }
