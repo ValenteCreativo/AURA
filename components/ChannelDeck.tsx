@@ -93,7 +93,7 @@ export default function ChannelDeck({ active, onSelect, channelLevels }: Props) 
 const styles: Record<string, CSSProperties> = {
   deck: {
     display: 'grid',
-    gap: 10
+    gap: 8
   },
   deckHeader: {
     display: 'flex',
@@ -122,15 +122,16 @@ const styles: Record<string, CSSProperties> = {
   },
   deckList: {
     display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: 8
   },
   row: {
     display: 'grid',
-    gridTemplateColumns: '14px minmax(0, 1fr) auto',
-    gap: 12,
-    alignItems: 'center',
+    gridTemplateColumns: '10px minmax(0, 1fr)',
+    gap: 10,
+    alignItems: 'start',
     textAlign: 'left',
-    padding: '10px 12px',
+    padding: '8px 10px',
     border: '1px solid rgba(255,255,255,0.07)',
     borderRadius: 12,
     background: 'rgba(255,255,255,0.02)',
@@ -157,28 +158,29 @@ const styles: Record<string, CSSProperties> = {
     minWidth: 0
   },
   rowTitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#f1fff5',
     letterSpacing: '0.04em'
   },
   rowMeta: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(220,235,225,0.55)',
     letterSpacing: '0.02em'
   },
   rowRight: {
     display: 'grid',
-    gap: 6,
-    justifyItems: 'end'
+    gap: 4,
+    justifyItems: 'start',
+    gridColumn: '2 / span 1'
   },
   rowRange: {
-    fontSize: 10,
-    letterSpacing: '0.18em',
+    fontSize: 9,
+    letterSpacing: '0.16em',
     textTransform: 'uppercase'
   },
   bar: {
     display: 'block',
-    width: 78,
+    width: '100%',
     height: 4,
     borderRadius: 4,
     background: 'rgba(255,255,255,0.08)',

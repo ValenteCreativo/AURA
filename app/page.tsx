@@ -8,6 +8,10 @@ import ChannelDeck from '@/components/ChannelDeck';
 import ContextPanel from '@/components/ContextPanel';
 import MicCapsule from '@/components/MicCapsule';
 import Marquee from '@/components/Marquee';
+import Spectrogram from '@/components/Spectrogram';
+import FrequencyBars from '@/components/FrequencyBars';
+import Waveform from '@/components/Waveform';
+import RadialMeter from '@/components/RadialMeter';
 import { useMicAnalyser } from '@/lib/mic-analyser';
 import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
@@ -142,6 +146,11 @@ export default function HomePage() {
 
       <style>{`
         body { overflow: hidden; }
+        @media (max-width: 1320px) {
+          .aura-stage-viz {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
         @media (max-width: 1180px) {
           body { overflow: auto; }
           .aura-cockpit-grid {
@@ -202,9 +211,7 @@ export default function HomePage() {
                 <span className="aura-serif" style={styles.heroAccent}>that breathes</span>
               </h1>
               <p style={styles.heroLede}>
-                AURA is a single sensor node that turns one corner of the city into a four-channel observatory:
-                biophony, anthrophony, geophony and live thermohygro telemetry. Each voxel below is a slice of
-                that signal — touch one to focus the data.
+                AURA turns one corner of the city into a four-channel observatory: life, humans, weather and live node telemetry. Touch a voxel to focus the signal.
               </p>
             </section>
 
@@ -245,6 +252,27 @@ export default function HomePage() {
                   micAnalyser={mic.analyser}
                   pulse={mic.level}
                 />
+                <div className="aura-stage-viz" style={styles.stageVizOverlay}>
+                  <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'sensor' ? '#c4b5fd66' : 'rgba(255,255,255,0.08)' }}>
+                    <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#c4b5fd' }}>sensor</span></div>
+                    <div style={styles.stageVizBodyCompact}>
+                      <RadialMeter label="t" value={sensor.temperature ?? 0} min={-5} max={45} unit="°C" color="#6ee7b7" size={92} />
+                      <RadialMeter label="rh" value={sensor.humidity ?? 0} min={0} max={100} unit="%" color="#7dd3fc" size={92} />
+                    </div>
+                  </div>
+                  <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'biophony' ? '#6ee7b766' : 'rgba(255,255,255,0.08)' }}>
+                    <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#6ee7b7' }}>bio</span></div>
+                    <Spectrogram height={92} intensity={intensity} speed={1 + intensity * 0.5} analyser={mic.analyser} />
+                  </div>
+                  <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'anthrophony' ? '#fb923c66' : 'rgba(255,255,255,0.08)' }}>
+                    <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#fb923c' }}>anthro</span></div>
+                    <FrequencyBars height={78} intensity={intensity} analyser={mic.analyser} bars={24} />
+                  </div>
+                  <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'geophony' ? '#7dd3fc66' : 'rgba(255,255,255,0.08)' }}>
+                    <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#7dd3fc' }}>geo</span></div>
+                    <Waveform height={72} intensity={Math.min(1.1, 0.6 + intensity * 0.45)} color="#7dd3fc" analyser={mic.analyser} />
+                  </div>
+                </div>
               </div>
 
               <div style={styles.stageOverlayBottom}>
@@ -268,7 +296,7 @@ export default function HomePage() {
                 micActive={micActive}
               />
             </div>
-            <MicCapsule mic={mic} />
+            <MicCapsule mic={mic} compact />
           </aside>
         </div>
 
@@ -402,15 +430,15 @@ const styles: Record<string, CSSProperties> = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(280px, 22%) minmax(0, 1fr) minmax(320px, 26%)',
-    gap: 14,
+    gridTemplateColumns: 'minmax(230px, 18%) minmax(0, 1fr) minmax(280px, 22%)',
+    gap: 12,
     height: '100%',
     minHeight: 0
   },
   railLeft: {
     display: 'grid',
     gridTemplateRows: 'auto auto auto',
-    gap: 14,
+    gap: 10,
     minHeight: 0,
     overflowY: 'auto',
     paddingRight: 4
@@ -423,7 +451,7 @@ const styles: Record<string, CSSProperties> = {
   },
   heroBlock: {
     display: 'grid',
-    gap: 12
+    gap: 8
   },
   heroEyebrow: {
     fontSize: 10,
@@ -433,7 +461,7 @@ const styles: Record<string, CSSProperties> = {
   },
   heroTitle: {
     margin: 0,
-    fontSize: 'clamp(2.4rem, 4.4vw, 4rem)',
+    fontSize: 'clamp(2rem, 3.5vw, 3.2rem)',
     lineHeight: 0.95,
     letterSpacing: '-0.045em',
     fontWeight: 600,
@@ -445,21 +473,21 @@ const styles: Record<string, CSSProperties> = {
   },
   heroLede: {
     margin: 0,
-    fontSize: 13,
-    lineHeight: 1.55,
-    color: 'rgba(220,235,225,0.72)',
-    maxWidth: '38ch'
+    fontSize: 12,
+    lineHeight: 1.45,
+    color: 'rgba(220,235,225,0.68)',
+    maxWidth: '32ch'
   },
   miniReadouts: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: 8
+    gap: 6
   },
   readout: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 2,
-    padding: '10px 12px',
+    gap: 1,
+    padding: '8px 10px',
     borderRadius: 12,
     border: '1px solid rgba(255,255,255,0.07)',
     background: 'rgba(255,255,255,0.025)',
@@ -472,7 +500,7 @@ const styles: Record<string, CSSProperties> = {
     textTransform: 'uppercase'
   },
   readoutValue: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 600,
     color: '#f1fff5',
     letterSpacing: '-0.03em'
@@ -492,7 +520,7 @@ const styles: Record<string, CSSProperties> = {
     height: '100%',
     display: 'grid',
     gridTemplateRows: 'auto 1fr auto',
-    padding: 18,
+    padding: 14,
     minHeight: 0
   },
   stageOverlayTop: {
@@ -508,7 +536,8 @@ const styles: Record<string, CSSProperties> = {
     position: 'relative',
     width: '100%',
     height: '100%',
-    minHeight: 0
+    minHeight: 0,
+    overflow: 'hidden'
   },
   stageOverlayBottom: {
     display: 'grid',
@@ -542,6 +571,43 @@ const styles: Record<string, CSSProperties> = {
     minHeight: 0,
     overflow: 'hidden',
     display: 'grid'
+  },
+  stageVizOverlay: {
+    position: 'absolute',
+    inset: '56px 14px 64px 14px',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gap: 10,
+    alignItems: 'end',
+    pointerEvents: 'none'
+  },
+  stageVizCard: {
+    pointerEvents: 'none',
+    alignSelf: 'end',
+    minHeight: 98,
+    padding: '8px 8px 6px',
+    borderRadius: 14,
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(4,8,7,0.38)',
+    backdropFilter: 'blur(10px)',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.18)'
+  },
+  stageVizHead: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6
+  },
+  stageVizLabel: {
+    fontSize: 9,
+    letterSpacing: '0.24em',
+    textTransform: 'uppercase'
+  },
+  stageVizBodyCompact: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: 4,
+    placeItems: 'center'
   },
   dock: {
     display: 'grid'

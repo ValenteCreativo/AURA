@@ -29,25 +29,25 @@ const NARRATIVES: Record<VoxelChannel, { eyebrow: string; title: string; body: s
     eyebrow: 'biophony · life signal',
     title: 'the chorus',
     body:
-      'Birds, insects and vegetation paint the upper bands. AURA tracks dawn and dusk peaks — the rhythm of an ecosystem still able to sing.'
+      'Birds, insects and vegetation in the upper bands. Dawn and dusk peaks tell you whether the ecosystem still sings.'
   },
   anthrophony: {
     eyebrow: 'anthrophony · human signal',
     title: 'the city pulse',
     body:
-      'Traffic, voices and machines saturate the low-mid range. When this band overwhelms biophony, NDSI sinks and the node enters attention.'
+      'Traffic, voices and machines push the low-mid range. When this dominates, NDSI falls and the node enters attention.'
   },
   geophony: {
     eyebrow: 'geophony · elemental signal',
     title: 'wind, rain, water',
     body:
-      'The slow rumble of weather. Geophony is sparse but high in inertia: when it spikes, it rewrites everything else above it for minutes at a time.'
+      'Wind, rain and water. Sparse but heavy; when it spikes, every other layer has to react.'
   },
   sensor: {
     eyebrow: 'sensor · live thermohygro',
     title: 'temperature & humidity',
     body:
-      'A DHT11 strapped to an ESP32 reports the body of the node every five seconds. This is the only telemetry that is fully alive right now.'
+      'A DHT11 on ESP32 reports the body of the node every five seconds. This is the live telemetry layer.'
   }
 };
 
@@ -146,9 +146,7 @@ function DefaultPanel() {
         <span className="aura-mono" style={styles.location}>tap a quadrant or row to highlight</span>
       </header>
       <p style={styles.body}>
-        AURA is a single-node observatory. The voxel city to your left is one place, four signals — biophony,
-        anthrophony, geophony and live thermohygro telemetry. Highlight a channel to surface its visualisers and the
-        story behind the numbers.
+        One place, four signals: biophony, anthrophony, geophony and live thermohygro telemetry. Highlight any layer to surface its visualiser.
       </p>
       <div style={styles.legend}>
         {(['biophony', 'anthrophony', 'geophony', 'sensor'] as VoxelChannel[]).map((c) => (
@@ -187,8 +185,8 @@ const styles: Record<string, CSSProperties> = {
   shell: {
     display: 'grid',
     gridTemplateRows: 'auto auto 1fr auto',
-    gap: 14,
-    padding: 18,
+    gap: 10,
+    padding: 14,
     height: '100%',
     minHeight: 0
   },
@@ -216,8 +214,8 @@ const styles: Record<string, CSSProperties> = {
   },
   body: {
     margin: 0,
-    fontSize: 13,
-    lineHeight: 1.55,
+    fontSize: 12,
+    lineHeight: 1.45,
     color: 'rgba(220,235,225,0.78)'
   },
   viz: {
@@ -234,8 +232,8 @@ const styles: Record<string, CSSProperties> = {
   footer: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: 10,
-    paddingTop: 12,
+    gap: 8,
+    paddingTop: 10,
     borderTop: '1px solid rgba(255,255,255,0.06)'
   },
   stat: {
