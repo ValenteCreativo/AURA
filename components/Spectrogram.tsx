@@ -7,9 +7,16 @@ type Props = {
   speed?: number;
   intensity?: number;
   analyser?: AnalyserNode | null;
+  idleMode?: 'synthetic' | 'flat';
 };
 
-export default function Spectrogram({ height = 220, speed = 1, intensity = 1, analyser = null }: Props) {
+export default function Spectrogram({
+  height = 220,
+  speed = 1,
+  intensity = 1,
+  analyser = null,
+  idleMode = 'synthetic'
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const analyserRef = useRef<AnalyserNode | null>(analyser);
 
@@ -90,7 +97,7 @@ export default function Spectrogram({ height = 220, speed = 1, intensity = 1, an
           const N = bins.length;
           const idx = Math.min(N - 1, Math.floor(Math.pow(f, 1.4) * N));
           v = (bins[idx] / 255) * (0.85 + intensity * 0.4);
-        } else {
+        } else if (idleMode === 'synthetic') {
           const lowMid = Math.exp(-Math.pow((f - 0.18) / 0.07, 2));
           const mid = Math.exp(-Math.pow((f - 0.42) / 0.09, 2));
           const high = Math.exp(-Math.pow((f - 0.78) / 0.06, 2));
@@ -109,6 +116,10 @@ export default function Spectrogram({ height = 220, speed = 1, intensity = 1, an
             noise;
 
           v *= 0.55 + intensity * 0.55;
+        } else {
+          const floor = 0.03 + (1 - f) * 0.015;
+          const emphasis = Math.exp(-Math.pow((f - 0.32) / 0.24, 2)) * 0.015;
+          v = floor + emphasis;
         }
         v = Math.max(0, Math.min(1, v));
 

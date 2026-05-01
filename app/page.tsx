@@ -93,6 +93,16 @@ export default function HomePage() {
   }, []);
 
   const stateColor = STATE_COLOR[sensor.state];
+  const sensorOnline = sensor.online;
+  const liveMicAvailable = mic.status === 'granted';
+  const shouldUseMicFallback = !sensorOnline && liveMicAvailable;
+  const liveAudioLabel = liveMicAvailable
+    ? shouldUseMicFallback
+      ? 'browser mic fallback active'
+      : 'browser mic live'
+    : sensorOnline
+      ? 'node telemetry live · mic optional'
+      : 'esp32 offline · activate mic fallback';
   const intensity = useMemo(() => {
     const t = sensor.temperature ?? 22;
     const h = sensor.humidity ?? 60;
@@ -101,7 +111,7 @@ export default function HomePage() {
   }, [sensor.temperature, sensor.humidity, mic.level]);
 
   const ndsi = acousticNow.ndsi;
-  const micActive = mic.status === 'granted';
+  const micActive = liveMicAvailable;
 
   const channelLevels = useMemo(() => {
     const t = sensor.temperature ?? 22;
@@ -159,6 +169,12 @@ export default function HomePage() {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             width: min(268px, calc(100% - 24px)) !important;
           }
+          .aura-dock-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+          .aura-dock-grid > :first-child {
+            grid-column: span 2 !important;
+          }
         }
         @media (max-width: 1240px) {
           body { overflow: auto; }
@@ -173,6 +189,12 @@ export default function HomePage() {
           .aura-shell {
             height: auto !important;
             min-height: 100vh !important;
+          }
+          .aura-dock-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .aura-dock-grid > :first-child {
+            grid-column: span 1 !important;
           }
         }
       `}</style>
@@ -201,7 +223,7 @@ export default function HomePage() {
               />
               {STATE_LABEL[sensor.state]}
             </span>
-            {micActive && <span className="aura-tag">mic · listening</span>}
+            {micActive && <span className="aura-tag">{shouldUseMicFallback ? 'mic · fallback live' : 'mic · listening'}</span>}
           </div>
           <div style={styles.topbarRight}>
             <span className="aura-mono" style={styles.coord}>19.4326° N</span>
@@ -236,7 +258,13 @@ export default function HomePage() {
                   {micActive ? 'release live mic' : 'activate live mic'}
                 </button>
                 <span className="aura-mono" style={styles.heroActionHint}>
-                  {micActive ? 'your room is driving the spectra now' : 'click once to let the browser feed live audio into the spectra'}
+                  {micActive
+                    ? shouldUseMicFallback
+                      ? 'esp32 is offline, so your room mic is driving the observatory right now'
+                      : 'your room is driving the spectra now'
+                    : sensorOnline
+                      ? 'click once to let the browser feed live audio into the spectra'
+                      : 'esp32 is offline · activate the browser mic to keep the observatory live'}
                 </span>
               </div>
             </section>
@@ -288,15 +316,15 @@ export default function HomePage() {
                   </div>
                   <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'biophony' ? '#6ee7b766' : 'rgba(255,255,255,0.08)' }}>
                     <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#6ee7b7' }}>bio</span></div>
-                    <Spectrogram height={92} intensity={intensity} speed={1 + intensity * 0.5} analyser={mic.analyser} />
+                    <Spectrogram height={92} intensity={intensity} speed={1 + intensity * 0.5} analyser={mic.analyser} idleMode="flat" />
                   </div>
                   <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'anthrophony' ? '#fb923c66' : 'rgba(255,255,255,0.08)' }}>
                     <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#fb923c' }}>anthro</span></div>
-                    <FrequencyBars height={78} intensity={intensity} analyser={mic.analyser} bars={24} />
+                    <FrequencyBars height={78} intensity={intensity} analyser={mic.analyser} bars={24} idleMode="flat" />
                   </div>
                   <div style={{ ...styles.stageVizCard, borderColor: activeChannel === 'geophony' ? '#7dd3fc66' : 'rgba(255,255,255,0.08)' }}>
                     <div style={styles.stageVizHead}><span className="aura-mono" style={{ ...styles.stageVizLabel, color: '#7dd3fc' }}>geo</span></div>
-                    <Waveform height={72} intensity={Math.min(1.1, 0.6 + intensity * 0.45)} color="#7dd3fc" analyser={mic.analyser} />
+                    <Waveform height={72} intensity={Math.min(1.1, 0.6 + intensity * 0.45)} color="#7dd3fc" analyser={mic.analyser} idleMode="flat" />
                   </div>
                 </div>
               </div>
@@ -322,11 +350,34 @@ export default function HomePage() {
                 micActive={micActive}
               />
             </div>
-            <MicCapsule mic={mic} compact />
+            <MicCapsule mic={mic} compact fallbackMode={!sensorOnline} />
           </aside>
         </div>
 
         <footer style={styles.dock}>
+          <div className="aura-dock-grid" style={styles.dockGrid}>
+            <div style={{ ...styles.dockCard, gridColumn: 'span 2' }}>
+              <div style={styles.dockCardHead}>
+                <span className="aura-mono" style={{ ...styles.dockCardLabel, color: '#6ee7b7' }}>lower spectrum</span>
+                <span className="aura-mono" style={styles.dockCardMeta}>{liveAudioLabel}</span>
+              </div>
+              <Spectrogram height={88} intensity={intensity} speed={1 + intensity * 0.4} analyser={mic.analyser} idleMode="flat" />
+            </div>
+            <div style={styles.dockCard}>
+              <div style={styles.dockCardHead}>
+                <span className="aura-mono" style={{ ...styles.dockCardLabel, color: '#fb923c' }}>pressure bars</span>
+                <span className="aura-mono" style={styles.dockCardMeta}>{micActive ? 'live' : 'standby'}</span>
+              </div>
+              <FrequencyBars height={88} intensity={intensity} analyser={mic.analyser} bars={34} idleMode="flat" />
+            </div>
+            <div style={styles.dockCard}>
+              <div style={styles.dockCardHead}>
+                <span className="aura-mono" style={{ ...styles.dockCardLabel, color: '#7dd3fc' }}>ambient line</span>
+                <span className="aura-mono" style={styles.dockCardMeta}>{sensorOnline ? 'node online' : 'fallback mode'}</span>
+              </div>
+              <Waveform height={88} intensity={Math.min(1.1, 0.7 + intensity * 0.35)} color="#7dd3fc" analyser={mic.analyser} idleMode="flat" />
+            </div>
+          </div>
           <div style={styles.dockMarquee}>
             <Marquee items={tickerItems} speed={52} />
           </div>
@@ -662,7 +713,43 @@ const styles: Record<string, CSSProperties> = {
     placeItems: 'center'
   },
   dock: {
-    display: 'grid'
+    display: 'grid',
+    gap: 8
+  },
+  dockGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gap: 8
+  },
+  dockCard: {
+    display: 'grid',
+    gap: 6,
+    padding: 8,
+    borderRadius: 16,
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.03)',
+    overflow: 'hidden',
+    minWidth: 0
+  },
+  dockCardHead: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0
+  },
+  dockCardLabel: {
+    fontSize: 9,
+    letterSpacing: '0.24em',
+    textTransform: 'uppercase'
+  },
+  dockCardMeta: {
+    fontSize: 9,
+    letterSpacing: '0.14em',
+    color: 'rgba(220,235,225,0.52)',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   dockMarquee: {
     width: '100%'

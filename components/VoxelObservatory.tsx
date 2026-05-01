@@ -39,7 +39,8 @@ type Props = {
 };
 
 const GRID = 8;
-const VOXEL_BOX_GEOMETRY = new THREE.BoxGeometry(0.42, 1, 0.42);
+const CELL_SPACING = 0.5;
+const VOXEL_BOX_GEOMETRY = new THREE.BoxGeometry(0.34, 1, 0.34);
 const VOXEL_EDGES_GEOMETRY = new THREE.EdgesGeometry(VOXEL_BOX_GEOMETRY);
 
 function buildLayout(): VoxelDef[] {
@@ -130,9 +131,9 @@ function VoxelGrid({
       const dim = active && !isActive ? 0.32 : 1;
       const liftMultiplier = isActive ? 1.55 : active ? 0.7 : 1;
       const target =
-        (vox.baseScale + channelLevel * 1.4 + live * 1.85 + pulse * 0.35) * liftMultiplier;
+        (vox.baseScale * 0.72 + channelLevel * 0.9 + live * 1.08 + pulse * 0.2) * liftMultiplier;
       const damped = mesh.scale.y + (target - mesh.scale.y) * 0.14;
-      const next = Math.max(0.12, damped);
+      const next = Math.min(2.8, Math.max(0.12, damped));
       mesh.scale.y = next;
       mesh.position.y = next / 2;
 
@@ -150,9 +151,9 @@ function VoxelGrid({
   });
 
   return (
-    <group>
+    <group position={[0, -0.08, 0]}>
       {layout.map((vox, i) => (
-        <group key={i} position={[vox.x * 0.55, 0, vox.z * 0.55]}>
+        <group key={i} position={[vox.x * CELL_SPACING, 0, vox.z * CELL_SPACING]}>
           <mesh
             ref={(el) => {
               meshRefs.current[i] = el;
@@ -171,7 +172,7 @@ function VoxelGrid({
               onSelect(vox.channel);
             }}
           >
-            <boxGeometry args={[0.42, 1, 0.42]} />
+            <boxGeometry args={[0.34, 1, 0.34]} />
             <meshStandardMaterial
               color={VOXEL_CHANNEL_COLOR[vox.channel]}
               emissive={VOXEL_CHANNEL_COLOR[vox.channel]}
@@ -209,19 +210,20 @@ function VoxelGrid({
 }
 
 function CameraOrbit({ active }: { active: VoxelChannel | null }) {
-  const { camera } = useThree();
-  const targetRef = useRef(new THREE.Vector3(0, 0.6, 0));
+  const { camera, size } = useThree();
+  const targetRef = useRef(new THREE.Vector3(0, 0.5, 0));
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    const baseRadius = 6.4;
+    const aspect = size.width / Math.max(1, size.height);
+    const baseRadius = aspect < 1 ? 8.1 : aspect < 1.3 ? 7.3 : 6.6;
     const angleBase = active === 'biophony' ? Math.PI * 1.25
       : active === 'anthrophony' ? Math.PI * 0.25
       : active === 'geophony' ? Math.PI * 0.75
       : active === 'sensor' ? Math.PI * 1.75
       : 0;
     const angle = angleBase + t * 0.05;
-    const elevation = active ? 3.4 : 4.2 + Math.sin(t * 0.18) * 0.18;
+    const elevation = active ? (aspect < 1.2 ? 4.2 : 3.55) : (aspect < 1.2 ? 4.8 : 4.2) + Math.sin(t * 0.18) * 0.18;
     const x = Math.sin(angle) * baseRadius;
     const z = Math.cos(angle) * baseRadius;
     camera.position.x += (x - camera.position.x) * 0.04;
@@ -236,7 +238,7 @@ export default function VoxelObservatory(props: Props) {
   return (
     <Canvas
       dpr={[1, 1.8]}
-      camera={{ position: [0, 4.4, 6.4], fov: 38 }}
+      camera={{ position: [0, 4.8, 7.6], fov: 42 }}
       gl={{ antialias: true, alpha: true }}
       style={{ width: '100%', height: '100%', background: 'transparent' }}
     >

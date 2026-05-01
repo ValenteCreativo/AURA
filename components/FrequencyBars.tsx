@@ -7,9 +7,16 @@ type Props = {
   bars?: number;
   intensity?: number;
   analyser?: AnalyserNode | null;
+  idleMode?: 'synthetic' | 'flat';
 };
 
-export default function FrequencyBars({ height = 180, bars = 56, intensity = 1, analyser = null }: Props) {
+export default function FrequencyBars({
+  height = 180,
+  bars = 56,
+  intensity = 1,
+  analyser = null,
+  idleMode = 'synthetic'
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const analyserRef = useRef<AnalyserNode | null>(analyser);
 
@@ -64,7 +71,7 @@ export default function FrequencyBars({ height = 180, bars = 56, intensity = 1, 
           const N = bins.length;
           const idx = Math.min(N - 1, Math.floor(Math.pow(f, 1.6) * N));
           v = (bins[idx] / 255) * (0.85 + intensity * 0.4);
-        } else {
+        } else if (idleMode === 'synthetic') {
           const lf = Math.exp(-Math.pow((f - 0.16) / 0.1, 2));
           const mf = Math.exp(-Math.pow((f - 0.45) / 0.13, 2));
           const hf = Math.exp(-Math.pow((f - 0.78) / 0.09, 2));
@@ -74,8 +81,11 @@ export default function FrequencyBars({ height = 180, bars = 56, intensity = 1, 
           v = lf * (0.4 + wob * 0.6) + mf * (0.35 + wob2 * 0.65) + hf * (0.55 + wob * 0.45);
           v += Math.random() * 0.1;
           v *= 0.45 + intensity * 0.6;
+        } else {
+          const contour = 0.03 + Math.exp(-Math.pow((f - 0.34) / 0.28, 2)) * 0.025;
+          v = contour;
         }
-        v = Math.max(0.04, Math.min(1, v));
+        v = Math.max(idleMode === 'flat' && !live ? 0.015 : 0.04, Math.min(1, v));
 
         peaks[i] = Math.max(peaks[i] * 0.92, v);
 

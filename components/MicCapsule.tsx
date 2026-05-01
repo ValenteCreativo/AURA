@@ -6,6 +6,7 @@ import type { MicAnalyser } from '@/lib/mic-analyser';
 type Props = {
   mic: MicAnalyser;
   compact?: boolean;
+  fallbackMode?: boolean;
 };
 
 const STATUS_COPY: Record<MicAnalyser['status'], { tag: string; tone: 'on' | 'warn' | 'mute' | 'alert' }> = {
@@ -16,7 +17,7 @@ const STATUS_COPY: Record<MicAnalyser['status'], { tag: string; tone: 'on' | 'wa
   unsupported: { tag: 'mic · unsupported', tone: 'alert' }
 };
 
-export default function MicCapsule({ mic, compact = false }: Props) {
+export default function MicCapsule({ mic, compact = false, fallbackMode = false }: Props) {
   const { status, level, bands, request, stop, errorLabel } = mic;
   const meta = STATUS_COPY[status];
   const isOn = status === 'granted';
@@ -53,12 +54,16 @@ export default function MicCapsule({ mic, compact = false }: Props) {
           {!compact && (
             <span style={styles.helper}>
               {isOn
-                ? 'voxels and spectra are now responding to your room in real time'
+                ? fallbackMode
+                  ? 'esp32 is offline, so the browser mic is now feeding the observatory in real time'
+                  : 'voxels and spectra are now responding to your room in real time'
                 : status === 'denied'
                   ? errorLabel ?? 'the browser blocked microphone access'
                   : status === 'unsupported'
                     ? 'this browser blocks getUserMedia'
-                    : 'browser will ask permission to capture audio locally · nothing leaves the device'}
+                    : fallbackMode
+                      ? 'esp32 is offline · allow browser mic access to keep the visualizers live'
+                      : 'browser will ask permission to capture audio locally · nothing leaves the device'}
             </span>
           )}
         </div>

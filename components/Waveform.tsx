@@ -7,9 +7,16 @@ type Props = {
   color?: string;
   intensity?: number;
   analyser?: AnalyserNode | null;
+  idleMode?: 'synthetic' | 'flat';
 };
 
-export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 1, analyser = null }: Props) {
+export default function Waveform({
+  height = 120,
+  color = '#6ee7b7',
+  intensity = 1,
+  analyser = null,
+  idleMode = 'synthetic'
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const analyserRef = useRef<AnalyserNode | null>(analyser);
 
@@ -100,12 +107,16 @@ export default function Waveform({ height = 120, color = '#6ee7b7', intensity = 
         live.getByteTimeDomainData(timeBuf);
         drawLiveLine(timeBuf, 0.32, color, intensity * 0.6);
         drawLiveLine(timeBuf, 0.95, color, intensity);
-      } else {
+      } else if (idleMode === 'synthetic') {
         const a = (h / 2) * 0.78 * intensity;
         drawSyntheticLine(a * 0.55, 0, 0.18, color);
         drawSyntheticLine(a * 0.7, 1.1, 0.32, color);
         drawSyntheticLine(a * 0.85, 2.4, 0.55, color);
         drawSyntheticLine(a, 0.4, 0.95, color);
+      } else {
+        const a = (h / 2) * 0.08 * Math.max(0.5, intensity);
+        drawSyntheticLine(a * 0.5, 0.3, 0.14, color);
+        drawSyntheticLine(a * 0.75, 1.2, 0.24, color);
       }
 
       ctx.strokeStyle = 'rgba(255,255,255,0.04)';
