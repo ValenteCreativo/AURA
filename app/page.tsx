@@ -124,7 +124,7 @@ export default function HomePage() {
   }, [mic.bands, micActive, acousticNow, sensor.temperature, sensor.humidity]);
 
   const tickerItems = [
-    'AURA · 2.2 · single-node observatory',
+    'AURA · 2.2 · urban ecosystem health observatory',
     `node ${sensor.nodeId}`,
     `t ${formatNumber(sensor.temperature)} °c`,
     `rh ${formatNumber(sensor.humidity, 0)} %`,
@@ -133,12 +133,12 @@ export default function HomePage() {
     `bio ${(channelLevels.biophony * 100).toFixed(0)}%`,
     `ant ${(channelLevels.anthrophony * 100).toFixed(0)}%`,
     `geo ${(channelLevels.geophony * 100).toFixed(0)}%`,
-    micActive ? 'mic · live' : 'mic · standby (mock signal)',
-    'bernie krause · soundscape ecology',
-    'depin · data-as-a-service'
+    micActive ? 'mic · live room input' : 'mic · ready to activate',
+    'urban ecosystem mapping · bernie krause',
+    'agents + ai + depin + data-as-a-service'
   ];
 
-  const heroEyebrow = micActive ? 'live · listening to your room' : 'live · simulated bioacoustics';
+  const heroEyebrow = micActive ? 'live · room audio feeding the observatory' : 'urban ecosystem health · live node + optional room audio';
 
   return (
     <div style={styles.shell}>
@@ -146,12 +146,21 @@ export default function HomePage() {
 
       <style>{`
         body { overflow: hidden; }
+        @media (max-width: 1480px) {
+          .aura-cockpit-grid {
+            grid-template-columns: minmax(196px, 220px) minmax(0, 1fr) minmax(248px, 286px) !important;
+          }
+          .aura-stage-viz {
+            width: min(292px, calc(100% - 28px)) !important;
+          }
+        }
         @media (max-width: 1320px) {
           .aura-stage-viz {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            width: min(268px, calc(100% - 24px)) !important;
           }
         }
-        @media (max-width: 1180px) {
+        @media (max-width: 1240px) {
           body { overflow: auto; }
           .aura-cockpit-grid {
             grid-template-columns: 1fr !important;
@@ -159,7 +168,7 @@ export default function HomePage() {
             height: auto !important;
           }
           .aura-stage {
-            min-height: 60vh !important;
+            min-height: 62vh !important;
           }
           .aura-shell {
             height: auto !important;
@@ -211,8 +220,25 @@ export default function HomePage() {
                 <span className="aura-serif" style={styles.heroAccent}>that breathes</span>
               </h1>
               <p style={styles.heroLede}>
-                AURA turns one corner of the city into a four-channel observatory: life, humans, weather and live node telemetry. Touch a voxel to focus the signal.
+                AURA maps the health of urban ecosystems through sound, climate and autonomous interpretation. This node listens for biophony, anthropophony and geophony, then layers live telemetry and future AI agents to detect environmental stress faster.
               </p>
+              <div style={styles.heroActions}>
+                <button
+                  type="button"
+                  onClick={() => (micActive ? mic.stop() : mic.request())}
+                  style={{
+                    ...styles.heroButton,
+                    borderColor: micActive ? '#fb7185' : '#6ee7b7',
+                    color: micActive ? '#fecaca' : '#b8ffd8',
+                    background: micActive ? 'rgba(251,113,133,0.1)' : 'rgba(110,231,183,0.1)'
+                  }}
+                >
+                  {micActive ? 'release live mic' : 'activate live mic'}
+                </button>
+                <span className="aura-mono" style={styles.heroActionHint}>
+                  {micActive ? 'your room is driving the spectra now' : 'click once to let the browser feed live audio into the spectra'}
+                </span>
+              </div>
             </section>
 
             <ChannelDeck
@@ -377,21 +403,21 @@ const styles: Record<string, CSSProperties> = {
   main: {
     position: 'relative',
     zIndex: 1,
-    width: 'min(1640px, calc(100% - 32px))',
+    width: 'min(1460px, calc(100% - 20px))',
     margin: '0 auto',
-    padding: '14px 0 12px',
+    padding: '10px 0 10px',
     display: 'grid',
     gridTemplateRows: 'auto 1fr auto',
-    gap: 12,
+    gap: 10,
     height: '100vh'
   },
   topbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
     flexWrap: 'wrap',
-    padding: '6px 0 10px',
+    padding: '4px 0 8px',
     borderBottom: '1px solid rgba(255,255,255,0.06)'
   },
   topbarLeft: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
@@ -430,28 +456,28 @@ const styles: Record<string, CSSProperties> = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(230px, 18%) minmax(0, 1fr) minmax(280px, 22%)',
-    gap: 12,
+    gridTemplateColumns: 'minmax(208px, 220px) minmax(0, 1fr) minmax(260px, 304px)',
+    gap: 10,
     height: '100%',
     minHeight: 0
   },
   railLeft: {
     display: 'grid',
     gridTemplateRows: 'auto auto auto',
-    gap: 10,
+    gap: 8,
     minHeight: 0,
     overflowY: 'auto',
-    paddingRight: 4
+    paddingRight: 2
   },
   railRight: {
     display: 'grid',
     gridTemplateRows: 'minmax(0, 1fr) auto',
-    gap: 12,
+    gap: 8,
     minHeight: 0
   },
   heroBlock: {
     display: 'grid',
-    gap: 8
+    gap: 6
   },
   heroEyebrow: {
     fontSize: 10,
@@ -461,8 +487,8 @@ const styles: Record<string, CSSProperties> = {
   },
   heroTitle: {
     margin: 0,
-    fontSize: 'clamp(2rem, 3.5vw, 3.2rem)',
-    lineHeight: 0.95,
+    fontSize: 'clamp(1.72rem, 2.7vw, 2.7rem)',
+    lineHeight: 0.94,
     letterSpacing: '-0.045em',
     fontWeight: 600,
     color: '#f4fff8'
@@ -473,21 +499,45 @@ const styles: Record<string, CSSProperties> = {
   },
   heroLede: {
     margin: 0,
-    fontSize: 12,
-    lineHeight: 1.45,
-    color: 'rgba(220,235,225,0.68)',
-    maxWidth: '32ch'
+    fontSize: 11,
+    lineHeight: 1.42,
+    color: 'rgba(220,235,225,0.72)',
+    maxWidth: '28ch'
+  },
+  heroActions: {
+    display: 'grid',
+    gap: 6,
+    alignItems: 'start'
+  },
+  heroButton: {
+    appearance: 'none',
+    border: '1px solid',
+    borderRadius: 8,
+    padding: '9px 10px',
+    fontFamily: 'var(--font-mono), monospace',
+    fontSize: 10,
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase',
+    justifySelf: 'start',
+    cursor: 'pointer'
+  },
+  heroActionHint: {
+    fontSize: 9,
+    letterSpacing: '0.11em',
+    color: 'rgba(220,235,225,0.54)',
+    lineHeight: 1.4,
+    maxWidth: '28ch'
   },
   miniReadouts: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: 6
+    gap: 5
   },
   readout: {
     display: 'flex',
     flexDirection: 'column',
     gap: 1,
-    padding: '8px 10px',
+    padding: '7px 8px',
     borderRadius: 12,
     border: '1px solid rgba(255,255,255,0.07)',
     background: 'rgba(255,255,255,0.025)',
@@ -500,7 +550,7 @@ const styles: Record<string, CSSProperties> = {
     textTransform: 'uppercase'
   },
   readoutValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 600,
     color: '#f1fff5',
     letterSpacing: '-0.03em'
@@ -520,7 +570,7 @@ const styles: Record<string, CSSProperties> = {
     height: '100%',
     display: 'grid',
     gridTemplateRows: 'auto 1fr auto',
-    padding: 14,
+    padding: 12,
     minHeight: 0
   },
   stageOverlayTop: {
@@ -542,14 +592,14 @@ const styles: Record<string, CSSProperties> = {
   stageOverlayBottom: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-    gap: 8,
-    paddingTop: 10,
+    gap: 6,
+    paddingTop: 8,
     borderTop: '1px solid rgba(255,255,255,0.06)'
   },
   quadrantBtn: {
     appearance: 'none',
     cursor: 'pointer',
-    padding: '8px 10px',
+    padding: '7px 8px',
     borderRadius: 10,
     border: '1px solid',
     display: 'grid',
@@ -569,26 +619,28 @@ const styles: Record<string, CSSProperties> = {
   },
   contextFrame: {
     minHeight: 0,
-    overflow: 'hidden',
+    overflow: 'auto',
     display: 'grid'
   },
   stageVizOverlay: {
     position: 'absolute',
-    inset: '56px 14px 64px 14px',
+    right: 12,
+    bottom: 64,
+    width: 'min(304px, calc(100% - 24px))',
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-    gap: 10,
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: 8,
     alignItems: 'end',
     pointerEvents: 'none'
   },
   stageVizCard: {
     pointerEvents: 'none',
     alignSelf: 'end',
-    minHeight: 98,
-    padding: '8px 8px 6px',
+    minHeight: 92,
+    padding: '7px 7px 6px',
     borderRadius: 14,
     border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(4,8,7,0.38)',
+    background: 'rgba(4,8,7,0.42)',
     backdropFilter: 'blur(10px)',
     boxShadow: '0 10px 30px rgba(0,0,0,0.18)'
   },
@@ -596,7 +648,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6
+    marginBottom: 4
   },
   stageVizLabel: {
     fontSize: 9,
@@ -606,7 +658,7 @@ const styles: Record<string, CSSProperties> = {
   stageVizBodyCompact: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: 4,
+    gap: 2,
     placeItems: 'center'
   },
   dock: {

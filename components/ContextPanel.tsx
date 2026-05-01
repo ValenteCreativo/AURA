@@ -61,7 +61,7 @@ export default function ContextPanel({
   micActive
 }: Props) {
   if (!active) {
-    return <DefaultPanel />;
+    return <DefaultPanel intensity={intensity} micAnalyser={micAnalyser} micActive={micActive} sensor={sensor} ndsi={ndsi} />;
   }
 
   const color = VOXEL_CHANNEL_COLOR[active];
@@ -84,13 +84,13 @@ export default function ContextPanel({
 
       <div style={styles.viz}>
         {active === 'biophony' && (
-          <Spectrogram height={180} intensity={intensity} speed={1 + intensity * 0.6} analyser={micAnalyser} />
+          <Spectrogram height={156} intensity={intensity} speed={1 + intensity * 0.6} analyser={micAnalyser} />
         )}
         {active === 'anthrophony' && (
-          <FrequencyBars height={180} intensity={intensity} analyser={micAnalyser} bars={48} />
+          <FrequencyBars height={156} intensity={intensity} analyser={micAnalyser} bars={40} />
         )}
         {active === 'geophony' && (
-          <Waveform height={180} intensity={Math.min(1.2, 0.7 + intensity * 0.6)} color={color} analyser={micAnalyser} />
+          <Waveform height={156} intensity={Math.min(1.2, 0.7 + intensity * 0.6)} color={color} analyser={micAnalyser} />
         )}
         {active === 'sensor' && (
           <div style={styles.sensorGrid}>
@@ -101,7 +101,7 @@ export default function ContextPanel({
               max={45}
               unit="°C"
               color="#6ee7b7"
-              size={140}
+              size={112}
             />
             <RadialMeter
               label="hum"
@@ -110,7 +110,7 @@ export default function ContextPanel({
               max={100}
               unit="%"
               color="#7dd3fc"
-              size={140}
+              size={112}
             />
           </div>
         )}
@@ -127,7 +127,7 @@ export default function ContextPanel({
           <>
             <Stat label="ndsi" value={ndsi.toFixed(2)} color={color} />
             <Stat label={active} value={`${Math.round(acoustic[active])}%`} color={color} />
-            <Stat label="source" value={micActive ? 'live mic' : 'simulation'} color={color} />
+            <Stat label="source" value={micActive ? 'live mic' : 'node + baseline model'} color={color} />
           </>
         )}
       </div>
@@ -135,19 +135,50 @@ export default function ContextPanel({
   );
 }
 
-function DefaultPanel() {
+function DefaultPanel({
+  intensity,
+  micAnalyser,
+  micActive,
+  sensor,
+  ndsi
+}: {
+  intensity: number;
+  micAnalyser: AnalyserNode | null;
+  micActive: boolean;
+  sensor: SensorApiResponse;
+  ndsi: number;
+}) {
   return (
     <div style={styles.shell}>
       <header style={styles.header}>
         <span className="aura-mono" style={{ ...styles.eyebrow, color: '#6ee7b7' }}>
-          observatory · idle layer
+          urban ecosystem health · overview
         </span>
-        <h2 style={styles.title}>select a channel</h2>
-        <span className="aura-mono" style={styles.location}>tap a quadrant or row to highlight</span>
+        <h2 style={styles.title}>from city noise to ecosystem intelligence</h2>
+        <span className="aura-mono" style={styles.location}>bioacoustics · climate telemetry · autonomous agents</span>
       </header>
       <p style={styles.body}>
-        One place, four signals: biophony, anthrophony, geophony and live thermohygro telemetry. Highlight any layer to surface its visualiser.
+        AURA is meant to map the health of urban ecosystems by comparing life signals against human noise and weather pressure, then feeding that data to AI agents that can detect threats and trigger faster responses.
       </p>
+      <div style={styles.overviewGrid}>
+        <div style={styles.overviewCard}>
+          <span className="aura-mono" style={{ ...styles.eyebrow, color: '#6ee7b7' }}>live spectrum</span>
+          <Spectrogram height={92} intensity={intensity} speed={1 + intensity * 0.55} analyser={micAnalyser} />
+        </div>
+        <div style={styles.overviewCard}>
+          <span className="aura-mono" style={{ ...styles.eyebrow, color: '#fb923c' }}>urban pressure</span>
+          <FrequencyBars height={78} intensity={intensity} analyser={micAnalyser} bars={22} />
+        </div>
+        <div style={styles.overviewCard}>
+          <span className="aura-mono" style={{ ...styles.eyebrow, color: '#7dd3fc' }}>ambient flow</span>
+          <Waveform height={62} intensity={Math.min(1.1, 0.65 + intensity * 0.45)} color="#7dd3fc" analyser={micAnalyser} />
+        </div>
+      </div>
+      <div style={styles.footer}>
+        <Stat label="mic" value={micActive ? 'live room input' : 'ready to activate'} color="#6ee7b7" />
+        <Stat label="ndsi" value={ndsi.toFixed(2)} color="#c4b5fd" />
+        <Stat label="node" value={`${sensor.nodeId} · ${sensor.online ? 'online' : 'waiting'}`} color="#7dd3fc" />
+      </div>
       <div style={styles.legend}>
         {(['biophony', 'anthrophony', 'geophony', 'sensor'] as VoxelChannel[]).map((c) => (
           <div key={c} style={styles.legendRow}>
@@ -185,14 +216,14 @@ const styles: Record<string, CSSProperties> = {
   shell: {
     display: 'grid',
     gridTemplateRows: 'auto auto 1fr auto',
-    gap: 10,
-    padding: 14,
+    gap: 8,
+    padding: 12,
     height: '100%',
     minHeight: 0
   },
   header: {
     display: 'grid',
-    gap: 6
+    gap: 4
   },
   eyebrow: {
     fontSize: 10,
@@ -201,39 +232,51 @@ const styles: Record<string, CSSProperties> = {
   },
   title: {
     margin: 0,
-    fontSize: 'clamp(1.6rem, 2vw, 2.2rem)',
-    lineHeight: 1.05,
+    fontSize: 'clamp(1.3rem, 1.7vw, 1.8rem)',
+    lineHeight: 1.04,
     letterSpacing: '-0.03em',
     color: '#f4fff8',
     fontWeight: 600
   },
   location: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(220,235,225,0.55)',
-    letterSpacing: '0.18em'
+    letterSpacing: '0.16em'
   },
   body: {
     margin: 0,
-    fontSize: 12,
-    lineHeight: 1.45,
-    color: 'rgba(220,235,225,0.78)'
+    fontSize: 11,
+    lineHeight: 1.4,
+    color: 'rgba(220,235,225,0.76)'
   },
   viz: {
     minHeight: 0,
     display: 'grid',
     alignContent: 'center'
   },
+  overviewGrid: {
+    display: 'grid',
+    gap: 8
+  },
+  overviewCard: {
+    display: 'grid',
+    gap: 6,
+    padding: '8px 8px 7px',
+    borderRadius: 12,
+    border: '1px solid rgba(255,255,255,0.07)',
+    background: 'rgba(255,255,255,0.025)'
+  },
   sensorGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: 12,
+    gap: 8,
     placeItems: 'center'
   },
   footer: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gap: 8,
-    paddingTop: 10,
+    gap: 6,
+    paddingTop: 8,
     borderTop: '1px solid rgba(255,255,255,0.06)'
   },
   stat: {
@@ -246,21 +289,21 @@ const styles: Record<string, CSSProperties> = {
     textTransform: 'uppercase'
   },
   statValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 600,
     color: '#f1fff5',
     letterSpacing: '-0.02em'
   },
   legend: {
     display: 'grid',
-    gap: 8,
-    padding: '14px 0 0',
+    gap: 6,
+    padding: '10px 0 0',
     borderTop: '1px solid rgba(255,255,255,0.06)'
   },
   legendRow: {
     display: 'grid',
-    gridTemplateColumns: '12px auto 1fr',
-    gap: 10,
+    gridTemplateColumns: '10px auto 1fr',
+    gap: 8,
     alignItems: 'center'
   },
   legendDot: {
@@ -271,15 +314,15 @@ const styles: Record<string, CSSProperties> = {
   },
   legendText: {
     fontFamily: 'var(--font-mono), monospace',
-    fontSize: 11,
-    letterSpacing: '0.18em',
+    fontSize: 10,
+    letterSpacing: '0.16em',
     textTransform: 'uppercase'
   },
   legendHint: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(220,235,225,0.5)',
     fontFamily: 'var(--font-mono), monospace',
-    letterSpacing: '0.12em',
+    letterSpacing: '0.1em',
     textAlign: 'right'
   }
 };

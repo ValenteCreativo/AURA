@@ -9,10 +9,10 @@ type Props = {
 };
 
 const STATUS_COPY: Record<MicAnalyser['status'], { tag: string; tone: 'on' | 'warn' | 'mute' | 'alert' }> = {
-  idle: { tag: 'mic · standby', tone: 'mute' },
+  idle: { tag: 'mic · ready', tone: 'mute' },
   requesting: { tag: 'mic · requesting…', tone: 'warn' },
   granted: { tag: 'mic · listening', tone: 'on' },
-  denied: { tag: 'mic · denied (using mock)', tone: 'alert' },
+  denied: { tag: 'mic · permission denied', tone: 'alert' },
   unsupported: { tag: 'mic · unsupported', tone: 'alert' }
 };
 
@@ -26,7 +26,7 @@ export default function MicCapsule({ mic, compact = false }: Props) {
       : meta.tone === 'alert' ? '#fb7185'
       : 'rgba(220,235,225,0.4)';
 
-  const cta = isOn ? 'release mic' : status === 'requesting' ? 'awaiting permission' : 'enable microphone';
+  const cta = isOn ? 'release mic' : status === 'requesting' ? 'awaiting permission' : 'activate live mic';
 
   return (
     <div style={{ ...styles.shell, padding: compact ? '10px 14px' : '14px 16px' }}>
@@ -53,9 +53,9 @@ export default function MicCapsule({ mic, compact = false }: Props) {
           {!compact && (
             <span style={styles.helper}>
               {isOn
-                ? 'voxels & spectra now respond to your room'
+                ? 'voxels and spectra are now responding to your room in real time'
                 : status === 'denied'
-                  ? errorLabel ?? 'visualisers continue with simulated bioacoustics'
+                  ? errorLabel ?? 'the browser blocked microphone access'
                   : status === 'unsupported'
                     ? 'this browser blocks getUserMedia'
                     : 'browser will ask permission to capture audio locally · nothing leaves the device'}
