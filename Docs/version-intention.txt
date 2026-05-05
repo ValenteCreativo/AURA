@@ -1,0 +1,157 @@
+AURA — Intención de la versión actual
+Fecha: 2026-05-05
+Proyecto: AURA
+Ubicación: /AURA
+
+Este archivo documenta el rumbo actual del proyecto para cualquier agente o colaborador que tome la siguiente iteración.
+
+==================================================
+1. IDEA CENTRAL
+==================================================
+
+Esta versión de AURA no debe sentirse como un dashboard genérico.
+Debe sentirse como una interfaz viva, inmersiva y artística para mapear señales de la salud de ecosistemas urbanos.
+
+El concepto importante no es “audio bonito” ni “visualización sci-fi” por sí sola.
+La intención es comunicar:
+
+- salud de ecosistemas urbanos
+- inteligencia ambiental
+- redes sensoriales distribuidas
+- interpretación de señales físicas mediante IA
+- agentes autónomos como capa de lectura / coordinación futura
+- una experiencia visual memorable, rara, poética y tecnológica
+
+La app debe sugerir que estamos viendo un primer nodo de una infraestructura ambiental más grande.
+
+==================================================
+2. DIRECCIÓN VISUAL Y TÉCNICA
+==================================================
+
+La experiencia debe apoyarse en:
+
+- visualización 3D
+- Three.js / escena central con presencia real
+- voxels como elemento principal del “organismo” o “campo de datos”
+- graphs / visualizadores múltiples integrados en la composición
+- motion reactivo al audio / micrófono / señal del nodo
+- look & feel tipo observatorio ambiental / instrumento científico-poético
+
+Los voxels NO son decorativos.
+Son el corazón visual del sistema.
+Deben verse claramente, renderizarse bien, tener escala correcta y ocupar un lugar central en la experiencia.
+
+==================================================
+3. COSAS QUE EL USUARIO HA PEDIDO EXPLÍCITAMENTE
+==================================================
+
+Mantener / reforzar:
+
+1. Que el voxel box sea protagonista.
+2. Que existan graphs “cool” tanto dentro de la escena como abajo.
+3. Que haya sensación de profundidad, 3D y sistema vivo.
+4. Que el layout completo sí quepa en pantalla.
+5. Que el panel derecho se vea completo, no cortado.
+6. Que los channels laterales no se coman el espacio.
+7. Que el micrófono real del navegador funcione como fallback si el ESP32 no está conectado.
+8. Que se eliminen mensajes o estados que parezcan “fake”, “emulados” o engañosos.
+9. Que la narrativa vuelva a centrarse en ecosistemas urbanos, IA, sensores, agentes autónomos y regeneración.
+
+==================================================
+4. NO NEGOCIABLES DE UX
+==================================================
+
+- Todo debe entrar en pantalla sin que se rompa la composición principal.
+- No debe haber paneles importantes fuera de viewport.
+- El visualizador derecho debe verse completo.
+- Los voxels deben ser inmediatamente visibles al cargar.
+- Si la escena 3D existe pero no se percibe, está fallando.
+- La interfaz no debe depender de scroll para descubrir lo más importante.
+- El centro de la pantalla debe comunicar valor en menos de 3 segundos.
+
+==================================================
+5. AUDIO / DATOS EN VIVO
+==================================================
+
+El comportamiento esperado es:
+
+- Si el ESP32 está conectado y enviando señal, usarlo.
+- Si el ESP32 no está disponible, usar el micrófono del navegador como fallback real.
+- Evitar copy engañosa que haga parecer “live” algo que es puro mock sin avisar.
+- Si existe simulación, debe estar claramente marcada como simulación.
+
+La experiencia debe sentirse reactiva a señal real cuando sea posible.
+
+==================================================
+6. PROBLEMAS OBSERVADOS EN LA ITERACIÓN ACTUAL
+==================================================
+
+Estos son los puntos que detonaron la corrección:
+
+- los voxels no se están viendo correctamente, o están mal escalados / mal posicionados / no renderizan como deberían
+- el layout sigue demasiado ancho en varias iteraciones
+- el panel derecho se corta o pierde protagonismo
+- algunas decisiones visuales empujaron demasiado la pieza hacia “demo sci-fi” y la alejaron de la tesis ambiental
+- hubo estados/copy que parecían emulados y eso rompió credibilidad
+- cambios previos aparentemente no fueron suficientemente visibles para el usuario en preview
+
+==================================================
+7. GUÍA PARA LA SIGUIENTE ITERACIÓN
+==================================================
+
+Prioridades en orden:
+
+1. Arreglar visibilidad y escala de voxels.
+2. Verificar que toda la composición entre realmente en pantalla.
+3. Asegurar que el panel derecho sea visible completo.
+4. Reintegrar / conservar las gráficas inferiores sin romper layout.
+5. Confirmar fallback real de micrófono de navegador.
+6. Afinar el copy y los labels para reforzar:
+   - salud de ecosistemas urbanos
+   - inteligencia ambiental
+   - bioseñales / sensores
+   - agentes autónomos
+   - monitoreo regenerativo
+
+==================================================
+8. CRITERIO DE ÉXITO
+==================================================
+
+La versión correcta debe hacer que el usuario diga algo como:
+
+“Ahora sí se ve el sistema vivo, se entienden los voxels, caben todos los elementos, y se siente como una interfaz para leer la salud de ecosistemas urbanos con sensores + IA + agentes.”
+
+Si solo se ve bonita pero no clara, no está lista.
+Si está clara pero se siente genérica, tampoco está lista.
+Debe lograr ambas cosas: claridad compositiva + identidad conceptual.
+
+==================================================
+9. PALABRAS CLAVE DE INTENCIÓN
+==================================================
+
+AURA
+observatorio
+urban ecosystems
+ambient intelligence
+threejs
+3D
+voxels
+reactive graphs
+microphone fallback
+ESP32
+autonomous agents
+regenerative sensing
+scientific-poetic interface
+
+==================================================
+10. NOTA FINAL PARA OTRO AGENTE
+==================================================
+
+No optimices solo por “que compile”.
+Optimiza por percepción real en pantalla.
+Verifica layout, escala, jerarquía visual y legibilidad del concepto.
+
+La pregunta guía es:
+¿esto se siente como un instrumento vivo para interpretar la salud de ecosistemas urbanos, o solo como una landing futurista?
+
+Si es lo segundo, todavía falta trabajo.
