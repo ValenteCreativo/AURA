@@ -8,9 +8,9 @@ import WaitlistSection from '@/components/WaitlistSection';
 import { useMicAnalyser } from '@/lib/mic-analyser';
 import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
-import type { TerrainProps } from '@/components/AcousticTerrain';
+import type { TerrainProps } from '@/components/AcousticTerrain_v2';
 
-const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain'), {
+const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain_v2'), {
   ssr: false,
   loading: () => null,
 });
@@ -292,10 +292,10 @@ function DataPill({
 
 function QuadrantLabels() {
   const labels = [
-    { label: 'BIOFONIA', sub: '2–11 kHz', color: '#6ee7b7', top: '42%', left: '22%' },
-    { label: 'GEOFONIA', sub: '20 Hz–2 kHz', color: '#7dd3fc', top: '42%', right: '22%' },
-    { label: 'ANTROFONIA', sub: '60 Hz–4 kHz', color: '#4a7a8a', bottom: '42%', left: '22%' },
-    { label: 'SENSOR', sub: 'temp · hum', color: '#c45c2a', bottom: '42%', right: '22%' },
+    { label: 'BIOFONIA', sub: 'aves · insectos · vida', color: '#6ee7b7', top: '28%', left: '25%' },
+    { label: 'GEOFONIA', sub: 'viento · agua · tierra', color: '#7dd3fc', top: '28%', right: '25%' },
+    { label: 'ANTROFONIA', sub: 'ciudad · tráfico · humanos', color: '#fb923c', bottom: '28%', left: '25%' },
+    { label: 'SENSOR', sub: 'temperatura · humedad', color: '#c45c2a', bottom: '28%', right: '25%' },
   ] as const;
 
   return (
@@ -311,23 +311,24 @@ function QuadrantLabels() {
             right: 'right' in l ? l.right : undefined,
             transform: 'translate(-50%, -50%)',
             textAlign: 'center',
-            background: 'rgba(0,8,5,0.8)',
-            padding: '8px 14px',
-            backdropFilter: 'blur(12px)',
-            border: `1px solid ${l.color}33`,
-            boxShadow: `0 4px 16px rgba(0,0,0,0.5), inset 0 0 20px ${l.color}11`,
+            background: 'rgba(0,0,0,0.85)',
+            padding: '10px 16px',
+            backdropFilter: 'blur(20px)',
+            border: `2px solid ${l.color}`,
+            boxShadow: `0 6px 24px rgba(0,0,0,0.7), inset 0 0 30px ${l.color}22`,
+            minWidth: 140,
           }}
         >
           <div
             className="aura-mono"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               letterSpacing: '0.32em',
               color: l.color,
-              opacity: 0.95,
+              fontWeight: 400,
               textTransform: 'uppercase',
-              marginBottom: 3,
-              textShadow: `0 0 12px ${l.color}88`,
+              marginBottom: 4,
+              textShadow: `0 0 16px ${l.color}`,
             }}
           >
             {l.label}
@@ -335,11 +336,11 @@ function QuadrantLabels() {
           <div
             className="aura-mono"
             style={{
-              fontSize: 8,
-              letterSpacing: '0.18em',
-              color: l.color,
-              opacity: 0.65,
-              textTransform: 'uppercase',
+              fontSize: 9,
+              letterSpacing: '0.14em',
+              color: 'rgba(255,255,255,0.75)',
+              textTransform: 'lowercase',
+              lineHeight: 1.4,
             }}
           >
             {l.sub}

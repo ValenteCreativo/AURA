@@ -169,12 +169,12 @@ select {
   position: relative;
   overflow: hidden;
   width: 100%;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: rgba(0, 10, 6, 0.4);
-  padding: 10px 0;
-  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  border-top: 1px solid rgba(110,231,183,0.3);
+  border-bottom: 1px solid rgba(110,231,183,0.3);
+  background: rgba(0,0,0,0.9);
+  padding: 14px 0;
+  mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
 }
 
 .aura-marquee-track {
@@ -184,10 +184,10 @@ select {
   animation: aura-marquee linear infinite;
   font-family: var(--font-mono), monospace;
   font-weight: 300;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--data-dim);
+  color: rgba(168,230,192,0.95);
 }
 
 .aura-marquee-item {
@@ -197,11 +197,11 @@ select {
 }
 
 .aura-marquee-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
-  background: var(--biophony-lo);
-  box-shadow: 0 0 8px var(--biophony-lo);
+  background: #6ee7b7;
+  box-shadow: 0 0 10px #6ee7b7;
 }
 
 /* Animaciones */
