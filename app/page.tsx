@@ -142,10 +142,14 @@ export default function HomePage() {
         {/* Top bar */}
         <header style={styles.topbar}>
           <div style={styles.topbarLeft}>
-            <span style={styles.wordmark} className="aura-serif">AURA</span>
-            <span className="aura-mono" style={styles.tagline}>
-              AUTONOMOUS URBAN REGENERATION VIA AUDIO
-            </span>
+            <div style={styles.wordmarkBox}>
+              <span style={styles.wordmark} className="aura-serif">AURA</span>
+            </div>
+            <div style={styles.taglineBox}>
+              <span className="aura-mono" style={styles.tagline}>
+                AUTONOMOUS URBAN REGENERATION VIA AUDIO
+              </span>
+            </div>
           </div>
           <div style={styles.topbarRight}>
             <span className="aura-mono" style={styles.coord}>19.4326° N  99.1332° W</span>
@@ -233,6 +237,18 @@ export default function HomePage() {
           <span className="aura-mono" style={styles.scrollLabel}>EXPLORAR</span>
           <div style={styles.scrollLine} />
         </div>
+
+        {/* Bottom vignette */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 160,
+          background: 'linear-gradient(to bottom, transparent, var(--bg-deep))',
+          zIndex: 5,
+          pointerEvents: 'none',
+        }} />
       </section>
 
       {/* ── MARQUEE ─────────────────────────────────────────────────────── */}
@@ -295,17 +311,23 @@ function QuadrantLabels() {
             right: 'right' in l ? l.right : undefined,
             transform: 'translate(-50%, -50%)',
             textAlign: 'center',
+            background: 'rgba(0,8,5,0.8)',
+            padding: '8px 14px',
+            backdropFilter: 'blur(12px)',
+            border: `1px solid ${l.color}33`,
+            boxShadow: `0 4px 16px rgba(0,0,0,0.5), inset 0 0 20px ${l.color}11`,
           }}
         >
           <div
             className="aura-mono"
             style={{
-              fontSize: 9,
+              fontSize: 10,
               letterSpacing: '0.32em',
               color: l.color,
-              opacity: 0.5,
+              opacity: 0.95,
               textTransform: 'uppercase',
-              marginBottom: 2,
+              marginBottom: 3,
+              textShadow: `0 0 12px ${l.color}88`,
             }}
           >
             {l.label}
@@ -316,7 +338,7 @@ function QuadrantLabels() {
               fontSize: 8,
               letterSpacing: '0.18em',
               color: l.color,
-              opacity: 0.28,
+              opacity: 0.65,
               textTransform: 'uppercase',
             }}
           >
@@ -362,42 +384,60 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'flex-start',
     padding: '24px 32px 0',
     pointerEvents: 'none',
+    background: 'linear-gradient(to bottom, rgba(0,5,8,0.75) 0%, transparent 100%)',
   },
   topbarLeft: {
     display: 'grid',
-    gap: 6,
+    gap: 8,
   },
   topbarRight: {
     display: 'grid',
     gap: 4,
     textAlign: 'right',
   },
+  wordmarkBox: {
+    display: 'inline-block',
+    background: 'rgba(0,8,5,0.85)',
+    padding: '12px 20px 10px',
+    backdropFilter: 'blur(16px)',
+    border: '1px solid rgba(110,231,183,0.2)',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
+  },
   wordmark: {
-    fontSize: 'clamp(2.4rem, 5vw, 4.5rem)',
-    color: 'var(--biophony)',
+    fontSize: 'clamp(2.8rem, 5.5vw, 5rem)',
+    color: '#a8e6c0',
     letterSpacing: '0.18em',
     lineHeight: 1,
-    textShadow: '0 0 40px rgba(110,231,183,0.4)',
+    textShadow: '0 0 60px rgba(110,231,183,0.7)',
     fontWeight: 400,
   },
+  taglineBox: {
+    display: 'inline-block',
+    background: 'rgba(0,8,5,0.75)',
+    padding: '6px 12px',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(110,231,183,0.12)',
+  },
   tagline: {
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: '0.32em',
-    color: 'var(--data-dim)',
+    color: 'rgba(168,230,192,0.85)',
     textTransform: 'uppercase',
     fontWeight: 300,
   },
   coord: {
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: '0.18em',
-    color: 'var(--data-ghost)',
+    color: 'rgba(168,230,192,0.6)',
     fontWeight: 300,
+    textShadow: '0 1px 3px rgba(0,0,0,0.9)',
   },
   clock: {
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: '0.22em',
-    color: 'var(--data-dim)',
+    color: 'rgba(168,230,192,0.8)',
     fontWeight: 300,
+    textShadow: '0 1px 3px rgba(0,0,0,0.9)',
   },
 
   // Listening badge
@@ -411,6 +451,10 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     gap: 8,
     pointerEvents: 'none',
+    background: 'rgba(0,8,5,0.65)',
+    padding: '6px 14px',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(110,231,183,0.15)',
   },
   listeningDot: {
     width: 6,
@@ -422,7 +466,7 @@ const styles: Record<string, CSSProperties> = {
   listeningLabel: {
     fontSize: 9,
     letterSpacing: '0.36em',
-    color: 'var(--data-dim)',
+    color: 'rgba(168,230,192,0.8)',
     textTransform: 'uppercase',
     fontWeight: 300,
   },
@@ -434,36 +478,38 @@ const styles: Record<string, CSSProperties> = {
     left: 32,
     zIndex: 10,
     display: 'flex',
-    gap: 2,
+    gap: 3,
     flexWrap: 'wrap',
-    maxWidth: '50vw',
+    maxWidth: '55vw',
   },
   dataPill: {
     display: 'grid',
-    gap: 2,
-    padding: '8px 12px',
-    background: 'rgba(0, 8, 5, 0.72)',
-    border: '1px solid var(--line)',
-    backdropFilter: 'blur(12px)',
+    gap: 3,
+    padding: '10px 14px',
+    background: 'rgba(0, 8, 5, 0.82)',
+    border: '1px solid rgba(110,231,183,0.25)',
+    backdropFilter: 'blur(16px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
   },
   dataPillLabel: {
-    fontSize: 8,
+    fontSize: 9,
     letterSpacing: '0.32em',
     textTransform: 'uppercase',
     fontWeight: 300,
   },
   dataPillValue: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 400,
-    color: '#e8f5ee',
+    color: '#f0fff8',
     letterSpacing: '-0.02em',
     fontFamily: 'var(--font-serif), serif',
     lineHeight: 1,
+    textShadow: '0 0 20px rgba(110,231,183,0.3)',
   },
   dataPillUnit: {
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: '0.12em',
-    color: 'rgba(168,230,192,0.5)',
+    color: 'rgba(168,230,192,0.6)',
     marginLeft: 3,
     fontWeight: 300,
   },
@@ -478,12 +524,16 @@ const styles: Record<string, CSSProperties> = {
     gap: 10,
     alignItems: 'end',
     justifyItems: 'end',
-    maxWidth: 280,
+    maxWidth: 300,
   },
   statusRow: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
+    background: 'rgba(0,8,5,0.7)',
+    padding: '6px 12px',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(110,231,183,0.12)',
   },
   statusDot: {
     width: 7,
@@ -500,27 +550,29 @@ const styles: Record<string, CSSProperties> = {
   nodeId: {
     fontSize: 10,
     letterSpacing: '0.18em',
-    color: 'var(--data-ghost)',
+    color: 'rgba(168,230,192,0.5)',
     fontWeight: 300,
   },
   micBtn: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
-    padding: '10px 16px',
+    padding: '12px 18px',
     border: '1px solid',
     background: 'transparent',
     cursor: 'pointer',
     transition: 'all 0.2s',
+    backdropFilter: 'blur(12px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
   },
   micDot: {
-    width: 6,
-    height: 6,
+    width: 7,
+    height: 7,
     borderRadius: 999,
     flexShrink: 0,
   },
   micLabel: {
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: '0.28em',
     textTransform: 'uppercase',
     fontWeight: 300,
@@ -528,13 +580,14 @@ const styles: Record<string, CSSProperties> = {
   micHint: {
     fontSize: 9,
     letterSpacing: '0.14em',
-    color: 'var(--data-ghost)',
+    color: 'rgba(168,230,192,0.5)',
     textTransform: 'uppercase',
     lineHeight: 1.5,
     textAlign: 'right',
-    maxWidth: 240,
+    maxWidth: 260,
     margin: 0,
     fontWeight: 300,
+    textShadow: '0 1px 4px rgba(0,0,0,0.8)',
   },
 
   // Scroll hint
