@@ -1,31 +1,27 @@
 import type { Metadata } from 'next';
-import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { EB_Garamond, DM_Mono } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const ebGaramond = EB_Garamond({
   subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap'
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500'],
   style: ['normal', 'italic'],
   variable: '--font-serif',
   display: 'swap'
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const dmMono = DM_Mono({
   subsets: ['latin'],
+  weight: ['300', '400'],
+  style: ['normal', 'italic'],
   variable: '--font-mono',
   display: 'swap'
 });
 
 export const metadata: Metadata = {
-  title: 'AURA 2.2 — Voxel observatory for urban bioacoustics',
+  title: 'AURA — Autonomous Urban Regeneration Via Audio',
   description:
-    'AURA is a single-node observatory that turns one corner of the city into a four-channel signal: biophony, anthrophony, geophony and live thermohygro telemetry — visible as a Heerich-inspired voxel composition.',
+    'AURA es la primera red que trata a los ecosistemas urbanos como agentes económicos con voz medible, archivo histórico inmutable y representación en el mercado global.',
   keywords: [
     'AURA',
     'bioecoacústica',
@@ -33,11 +29,14 @@ export const metadata: Metadata = {
     'DePIN',
     'sensores urbanos',
     'agentic AI',
-    'Bernie Krause'
+    'Bernie Krause',
+    'paisaje sonoro',
+    'ecosistemas urbanos',
+    'biofonia'
   ],
-  authors: [{ name: 'AURA / ARVI' }],
+  authors: [{ name: 'AURA · Frutero Club · CDMX' }],
   openGraph: {
-    title: 'AURA — El bosque respira, el sistema escucha',
+    title: 'AURA — Los ecosistemas merecen voz',
     description:
       'Red de inteligencia ambiental autónoma. Bioecoacústica, sensores distribuidos y agentes interpretativos para el sistema nervioso de la ciudad.',
     type: 'website'
@@ -46,7 +45,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}>
+    <html lang="es" className={`${ebGaramond.variable} ${dmMono.variable}`}>
       <body>{children}</body>
     </html>
   );

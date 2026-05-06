@@ -1,24 +1,39 @@
 :root {
   color-scheme: dark;
-  --bg-0: #050807;
-  --bg-1: #07110d;
-  --bg-2: #0a1c16;
-  --ink-0: #f4f7f1;
-  --ink-1: #cbd5cb;
-  --ink-2: #8a9b94;
-  --ink-3: #5b6e68;
-  --moss: #6ee7b7;
-  --moss-soft: rgba(110, 231, 183, 0.18);
-  --moss-line: rgba(110, 231, 183, 0.28);
-  --amber: #f59e0b;
-  --rose: #fb7185;
-  --sky: #7dd3fc;
-  --violet: #c4b5fd;
-  --line: rgba(244, 247, 241, 0.08);
-  --line-strong: rgba(244, 247, 241, 0.16);
-  --surface-0: rgba(255, 255, 255, 0.025);
-  --surface-1: rgba(255, 255, 255, 0.045);
-  --surface-2: rgba(255, 255, 255, 0.07);
+
+  /* Paleta fundacional AURA */
+  --bg-deep:        #000508;
+  --bg-mid:         #010b07;
+  --terrain-near:   #020a05;
+
+  --biophony-hi:    #a8e6c0;
+  --biophony:       #6ee7b7;
+  --biophony-lo:    #4a9e72;
+
+  --anthro-hi:      #4a7a8a;
+  --anthro:         #2a5a6a;
+  --anthro-lo:      #1a3a44;
+
+  --barragán:       #c45c2a;
+  --barragán-soft:  rgba(196, 92, 42, 0.35);
+
+  --data-text:      rgba(0, 220, 160, 0.9);
+  --data-dim:       rgba(0, 180, 120, 0.4);
+  --data-ghost:     rgba(0, 140, 90, 0.2);
+  --data-esp32:     rgba(180, 120, 60, 0.7);
+
+  --grid-ikeda:     rgba(0, 180, 140, 0.05);
+  --grid-bright:    rgba(0, 220, 160, 0.12);
+
+  --sky:            #7dd3fc;
+  --violet:         #c4b5fd;
+  --rose:           #fb7185;
+  --amber:          #f59e0b;
+
+  --line:           rgba(0, 220, 160, 0.08);
+  --line-strong:    rgba(0, 220, 160, 0.16);
+  --surface-0:      rgba(0, 255, 180, 0.02);
+  --surface-1:      rgba(0, 255, 180, 0.04);
 }
 
 * {
@@ -37,13 +52,11 @@ html {
 }
 
 body {
-  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-feature-settings: "ss01", "cv01", "cv02";
-  background: var(--bg-0);
-  color: var(--ink-0);
+  font-family: var(--font-serif), "EB Garamond", "Times New Roman", serif;
+  background: var(--bg-deep);
+  color: #e8f5ee;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.005em;
   overflow-x: hidden;
 }
 
@@ -61,198 +74,173 @@ select {
 }
 
 ::selection {
-  background: rgba(110, 231, 183, 0.35);
+  background: rgba(110, 231, 183, 0.3);
   color: #fff;
 }
 
+/* Tipografía */
 .aura-serif {
-  font-family: var(--font-serif), "Times New Roman", serif;
-  font-feature-settings: "liga", "dlig";
+  font-family: var(--font-serif), "EB Garamond", serif;
 }
 
 .aura-mono {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-feature-settings: "ss01", "zero";
+  font-family: var(--font-mono), "DM Mono", ui-monospace, monospace;
+  font-weight: 300;
 }
 
-.aura-eyebrow {
+/* Tags de estado */
+.aura-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 220, 160, 0.2);
+  background: rgba(0, 220, 160, 0.06);
+  color: var(--data-text);
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  letter-spacing: 0.32em;
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--moss);
-  opacity: 0.85;
 }
 
-.aura-divider {
-  height: 1px;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+.aura-tag.warn {
+  border-color: rgba(196, 92, 42, 0.35);
+  background: rgba(196, 92, 42, 0.08);
+  color: var(--barragán);
 }
 
-.aura-hairline {
+.aura-tag.alert {
+  border-color: rgba(251, 113, 133, 0.3);
+  background: rgba(251, 113, 133, 0.08);
+  color: #fecaca;
+}
+
+.aura-tag.mute {
+  border-color: rgba(0, 220, 160, 0.1);
+  background: rgba(0, 220, 160, 0.03);
+  color: var(--data-dim);
+}
+
+/* Frame con esquinas Ikeda */
+.aura-frame {
+  position: relative;
   border: 1px solid var(--line);
+  background: rgba(0, 10, 6, 0.6);
+  backdrop-filter: blur(20px);
 }
 
-.aura-grain::before {
-  content: "";
+.aura-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(0, 220, 160, 0.4);
+  pointer-events: none;
+}
+.aura-corner.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.aura-corner.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+.aura-corner.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+.aura-corner.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+/* Grid Ikeda */
+.aura-grid-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  opacity: 0.6;
-  mix-blend-mode: overlay;
+  background-image:
+    linear-gradient(var(--grid-ikeda) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-ikeda) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-@keyframes aura-breathe {
-  0%, 100% {
-    transform: scale(0.97);
-    filter: brightness(0.95);
-  }
-  50% {
-    transform: scale(1.04);
-    filter: brightness(1.1);
-  }
+.aura-grid-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-bright) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-bright) 1px, transparent 1px);
+  background-size: 192px 192px;
 }
 
-@keyframes aura-pulse {
-  0% { opacity: 0.55; transform: scale(0.7); }
-  60% { opacity: 0; transform: scale(1.6); }
-  100% { opacity: 0; transform: scale(1.6); }
-}
-
-@keyframes aura-drift {
-  0% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -14px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes aura-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes aura-blink {
-  0%, 60% { opacity: 1; }
-  61%, 100% { opacity: 0.25; }
-}
-
-@keyframes aura-marquee {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-
-@keyframes aura-spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes aura-flicker {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
-  72% { opacity: 0.55; }
-}
-
+/* Marquee */
 .aura-marquee {
   position: relative;
   overflow: hidden;
   width: 100%;
-  border-block: 1px solid var(--line);
-  background: linear-gradient(90deg, rgba(110, 231, 183, 0.04), rgba(125, 211, 252, 0.04));
-  padding: 12px 0;
-  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(0, 10, 6, 0.4);
+  padding: 10px 0;
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
 }
 
 .aura-marquee-track {
   display: inline-flex;
-  gap: 56px;
+  gap: 48px;
   white-space: nowrap;
   animation: aura-marquee linear infinite;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.18em;
+  font-family: var(--font-mono), monospace;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(220, 235, 225, 0.7);
+  color: var(--data-dim);
 }
 
 .aura-marquee-item {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .aura-marquee-dot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 999px;
-  background: var(--moss);
-  box-shadow: 0 0 14px var(--moss);
+  background: var(--biophony-lo);
+  box-shadow: 0 0 8px var(--biophony-lo);
 }
 
-.aura-frame {
-  position: relative;
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
-  backdrop-filter: blur(20px);
-  overflow: hidden;
+/* Animaciones */
+@keyframes aura-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }
 
-.aura-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 40%),
-    radial-gradient(120% 70% at 100% 0%, rgba(110, 231, 183, 0.08), transparent 60%);
-  border-radius: inherit;
+@keyframes aura-flicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+  72% { opacity: 0.5; }
 }
 
-.aura-corner {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 1px solid rgba(110, 231, 183, 0.5);
-  pointer-events: none;
-}
-.aura-corner.tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
-.aura-corner.tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
-.aura-corner.bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
-.aura-corner.br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
-
-.aura-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(110, 231, 183, 0.25);
-  background: rgba(110, 231, 183, 0.08);
-  color: #b8ffd8;
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+@keyframes aura-pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  70% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
 }
 
-.aura-tag.warn {
-  border-color: rgba(251, 191, 36, 0.3);
-  background: rgba(251, 191, 36, 0.1);
-  color: #fde68a;
+@keyframes aura-breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
-.aura-tag.alert {
-  border-color: rgba(251, 113, 133, 0.3);
-  background: rgba(251, 113, 133, 0.1);
-  color: #fecaca;
+@keyframes aura-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.aura-tag.mute {
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(220, 235, 225, 0.7);
+@keyframes aura-scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
   * {
