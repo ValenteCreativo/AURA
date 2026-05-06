@@ -48,7 +48,7 @@ function rng(s: number): number {
 // ── Terrain ───────────────────────────────────────────────────────────────────
 function Terrain({ micAnalyser, temperature, humidity, micBands }: TerrainProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const binsRef = useRef<Uint8Array | null>(null);
+  const binsRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const t0 = useRef(0);
 
   const geometry = useMemo(() => {
@@ -70,7 +70,7 @@ function Terrain({ micAnalyser, temperature, humidity, micBands }: TerrainProps)
     // Refresh frequency bins
     if (micAnalyser) {
       if (!binsRef.current || binsRef.current.length !== micAnalyser.frequencyBinCount) {
-        binsRef.current = new Uint8Array(micAnalyser.frequencyBinCount);
+        binsRef.current = new Uint8Array(new ArrayBuffer(micAnalyser.frequencyBinCount));
       }
       micAnalyser.getByteFrequencyData(binsRef.current);
     }

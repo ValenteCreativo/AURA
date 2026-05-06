@@ -13,10 +13,20 @@ export default function WaitlistSection() {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    // Simulate submission — replace with real endpoint when ready
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
-    setSubmitted(true);
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), location: location.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Error desconocido');
+      setSubmitted(true);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al registrar. Intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

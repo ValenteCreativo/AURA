@@ -8,9 +8,9 @@ import WaitlistSection from '@/components/WaitlistSection';
 import { useMicAnalyser } from '@/lib/mic-analyser';
 import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
-import type { TerrainProps } from '@/components/AcousticTerrain_v3';
+import type { TerrainProps } from '@/components/AcousticTerrain_v4';
 
-const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain_v3'), {
+const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain_v4'), {
   ssr: false,
   loading: () => null,
 });
@@ -292,61 +292,57 @@ function DataPill({
 
 function QuadrantLabels() {
   const labels = [
-    { label: 'BIOFONIA', sub: 'aves · insectos · vida', color: '#6ee7b7', top: '28%', left: '25%' },
-    { label: 'GEOFONIA', sub: 'viento · agua · tierra', color: '#7dd3fc', top: '28%', right: '25%' },
-    { label: 'ANTROFONIA', sub: 'ciudad · tráfico · humanos', color: '#fb923c', bottom: '28%', left: '25%' },
-    { label: 'SENSOR', sub: 'temperatura · humedad', color: '#c45c2a', bottom: '28%', right: '25%' },
+    { label: 'ANTROFONIA', sub: 'ciudad · tráfico · humanos', color: '#2a5a8a', left: '12%' },
+    { label: 'GEOFONIA', sub: 'viento · agua · tierra', color: '#1a8a7a', left: '32%' },
+    { label: 'BIOFONIA', sub: 'aves · insectos · vida', color: '#3aaa6a', left: '52%' },
+    { label: 'SENSOR', sub: 'pájaros · bioluminiscencia', color: '#5ae8a8', left: '72%' },
   ] as const;
 
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
-      {labels.map((l) => (
-        <div
-          key={l.label}
-          style={{
-            position: 'absolute',
-            top: 'top' in l ? l.top : undefined,
-            bottom: 'bottom' in l ? l.bottom : undefined,
-            left: 'left' in l ? l.left : undefined,
-            right: 'right' in l ? l.right : undefined,
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            background: 'rgba(0,0,0,0.85)',
-            padding: '10px 16px',
-            backdropFilter: 'blur(20px)',
-            border: `2px solid ${l.color}`,
-            boxShadow: `0 6px 24px rgba(0,0,0,0.7), inset 0 0 30px ${l.color}22`,
-            minWidth: 140,
-          }}
-        >
+    <div style={{ position: 'absolute', bottom: '18%', left: 0, right: 0, pointerEvents: 'none', zIndex: 2 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', padding: '0 20px' }}>
+        {labels.map((l) => (
           <div
-            className="aura-mono"
+            key={l.label}
             style={{
-              fontSize: 11,
-              letterSpacing: '0.32em',
-              color: l.color,
-              fontWeight: 400,
-              textTransform: 'uppercase',
-              marginBottom: 4,
-              textShadow: `0 0 16px ${l.color}`,
+              textAlign: 'center',
+              background: 'rgba(0,0,0,0.85)',
+              padding: '10px 16px',
+              backdropFilter: 'blur(20px)',
+              border: `2px solid ${l.color}`,
+              boxShadow: `0 6px 24px rgba(0,0,0,0.7), inset 0 0 30px ${l.color}22`,
+              minWidth: 140,
             }}
           >
-            {l.label}
+            <div
+              className="aura-mono"
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.32em',
+                color: l.color,
+                fontWeight: 400,
+                textTransform: 'uppercase',
+                marginBottom: 4,
+                textShadow: `0 0 16px ${l.color}`,
+              }}
+            >
+              {l.label}
+            </div>
+            <div
+              className="aura-mono"
+              style={{
+                fontSize: 9,
+                letterSpacing: '0.14em',
+                color: 'rgba(255,255,255,0.75)',
+                textTransform: 'lowercase',
+                lineHeight: 1.4,
+              }}
+            >
+              {l.sub}
+            </div>
           </div>
-          <div
-            className="aura-mono"
-            style={{
-              fontSize: 9,
-              letterSpacing: '0.14em',
-              color: 'rgba(255,255,255,0.75)',
-              textTransform: 'lowercase',
-              lineHeight: 1.4,
-            }}
-          >
-            {l.sub}
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
