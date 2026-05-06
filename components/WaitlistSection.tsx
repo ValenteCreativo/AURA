@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 
 export default function WaitlistSection() {
   const [email, setEmail] = useState('');
-  const [location, setLocation] = useState('');
+  const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ export default function WaitlistSection() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), location: location.trim() }),
+        body: JSON.stringify({ email: email.trim(), location: name.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Error desconocido');
@@ -90,9 +90,9 @@ export default function WaitlistSection() {
         <div style={styles.formHeader}>
           <h3 style={styles.formTitle}>Sé un nodo.</h3>
           <p style={styles.formSubtitle}>
-            El primer prototipo de sensor AURA está en desarrollo.
-            Únete a la lista de espera para recibir el tuyo
-            cuando el proceso de fabricación esté listo.
+            El primer sensor AURA está en desarrollo.
+            Si tienes un balcón o azotea con acceso a luz y WiFi,
+            puedes ser parte de la primera red de escucha urbana.
           </p>
         </div>
 
@@ -109,6 +109,14 @@ export default function WaitlistSection() {
         ) : (
           <form onSubmit={handleSubmit} style={styles.form}>
             <input
+              type="text"
+              required
+              placeholder="Tu nombre"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={styles.input}
+            />
+            <input
               type="email"
               required
               placeholder="tu@email.com"
@@ -116,20 +124,13 @@ export default function WaitlistSection() {
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
             />
-            <input
-              type="text"
-              placeholder="Ciudad · espacio verde donde desplegarías el sensor"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              style={styles.input}
-            />
             <button type="submit" disabled={loading} style={styles.submitBtn}>
               <span className="aura-mono" style={styles.submitLabel}>
-                {loading ? 'registrando…' : 'ÚNETE A LA RED →'}
+                {loading ? 'registrando…' : 'QUIERO UN SENSOR →'}
               </span>
             </button>
             <p style={styles.formNote} className="aura-mono">
-              No eres un usuario. Eres un custodio.
+              Solo necesitas un balcón o azotea · luz · WiFi
             </p>
           </form>
         )}
@@ -138,18 +139,18 @@ export default function WaitlistSection() {
       {/* Audience callouts */}
       <div style={styles.audiences}>
         <AudienceCard
-          label="Comunidades y activistas"
-          body="Cada parque, humedal o jardín comunitario merece un testigo."
+          label="Vecinos y residentes"
+          body="Si tienes un balcón o azotea con WiFi, puedes convertirte en un punto de escucha de tu colonia."
           color="var(--biophony)"
         />
         <AudienceCard
           label="Investigadores e instituciones"
-          body="Los datos de la red son abiertos para investigación científica."
+          body="Los datos de la red son abiertos para investigación científica y política pública."
           color="var(--data-text)"
         />
         <AudienceCard
-          label="Fundaciones y gobierno"
-          body="El archivo de AURA es evidencia verificable para política pública."
+          label="Empresas y fundaciones"
+          body="El archivo de AURA es evidencia verificable del estado sonoro de los ecosistemas urbanos."
           color="var(--barragán)"
         />
       </div>

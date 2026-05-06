@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 import dynamic from 'next/dynamic';
 import Marquee from '@/components/Marquee';
 import WaitlistSection from '@/components/WaitlistSection';
+import AIBrainBar from '@/components/AIBrainBar';
 import { useMicAnalyser } from '@/lib/mic-analyser';
 import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
@@ -142,14 +143,25 @@ export default function HomePage() {
         {/* Top bar */}
         <header style={styles.topbar}>
           <div style={styles.topbarLeft}>
-            <div style={styles.wordmarkBox}>
-              <span style={styles.wordmark} className="aura-serif">AURA</span>
+            {/* Wordmark + tagline en columna */}
+            <div style={{ display: 'grid', gap: 6 }}>
+              <div style={styles.wordmarkBox}>
+                <span style={styles.wordmark} className="aura-serif">AURA</span>
+              </div>
+              <div style={styles.taglineBox}>
+                <span className="aura-mono" style={styles.tagline}>
+                  AUTONOMOUS URBAN REGENERATION VIA AUDIO
+                </span>
+              </div>
             </div>
-            <div style={styles.taglineBox}>
-              <span className="aura-mono" style={styles.tagline}>
-                AUTONOMOUS URBAN REGENERATION VIA AUDIO
-              </span>
-            </div>
+            {/* AI Brain Bar — sale del wordmark hacia la derecha */}
+            <AIBrainBar
+              temperature={sensor.temperature}
+              humidity={sensor.humidity}
+              micLevel={mic.level}
+              micBands={mic.bands}
+              sensorOnline={sensorOnline}
+            />
           </div>
           <div style={styles.topbarRight}>
             <span className="aura-mono" style={styles.coord}>19.4326° N  99.1332° W</span>
@@ -384,8 +396,10 @@ const styles: Record<string, CSSProperties> = {
     background: 'linear-gradient(to bottom, rgba(0,5,8,0.75) 0%, transparent 100%)',
   },
   topbarLeft: {
-    display: 'grid',
-    gap: 8,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0,
+    flexWrap: 'nowrap',
   },
   topbarRight: {
     display: 'grid',
