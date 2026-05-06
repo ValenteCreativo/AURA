@@ -8,9 +8,9 @@ import WaitlistSection from '@/components/WaitlistSection';
 import { useMicAnalyser } from '@/lib/mic-analyser';
 import { generate24h } from '@/lib/history-mock';
 import type { SensorApiResponse } from '@/lib/sensor-store';
-import type { TerrainProps } from '@/components/AcousticTerrain_v2';
+import type { TerrainProps } from '@/components/AcousticTerrain_v3';
 
-const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain_v2'), {
+const AcousticTerrain = dynamic(() => import('@/components/AcousticTerrain_v3'), {
   ssr: false,
   loading: () => null,
 });
