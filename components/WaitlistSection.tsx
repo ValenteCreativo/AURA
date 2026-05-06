@@ -85,6 +85,9 @@ export default function WaitlistSection() {
         AURA no escucha a las personas. AURA escucha a los que nadie escucha.
       </p>
 
+      {/* Intelligence Curse section */}
+      <IntelligenceCurseSection />
+
       {/* Waitlist form */}
       <div style={styles.formBlock}>
         <div style={styles.formHeader}>
@@ -178,6 +181,263 @@ export default function WaitlistSection() {
     </section>
   );
 }
+
+// ── Intelligence Curse Section ────────────────────────────────────────────────
+function IntelligenceCurseSection() {
+  return (
+    <div style={icStyles.wrapper}>
+
+      {/* Horizontal rule with label */}
+      <div style={icStyles.ruleRow}>
+        <div style={icStyles.ruleLine} />
+        <span className="aura-mono" style={icStyles.ruleLabel}>tesis</span>
+        <div style={icStyles.ruleLine} />
+      </div>
+
+      {/* Opening statement — large, centered */}
+      <div style={icStyles.opening}>
+        <p className="aura-mono" style={icStyles.openingEyebrow}>
+          Drago &amp; Laine · The Intelligence Curse · 2025
+        </p>
+        <h2 style={icStyles.openingH}>
+          Cuando la IA no necesite a las personas,<br />
+          <em>tampoco necesitará a los pájaros.</em>
+        </h2>
+        <p style={icStyles.openingBody}>
+          La Intelligence Curse describe cómo la llegada del AGI destruirá el incentivo
+          de los actores poderosos para invertir en las personas.
+          AURA extiende esa lógica: si los actores poderosos ya no necesitan a los humanos,
+          mucho menos necesitarán a los ecosistemas.
+          A menos que exista una infraestructura que haga que la salud de esos ecosistemas
+          tenga valor económico verificable y no ignorable.
+        </p>
+      </div>
+
+      {/* The argument — two columns */}
+      <div style={icStyles.argGrid}>
+        <div style={icStyles.argCol}>
+          <span className="aura-mono" style={{ ...icStyles.argLabel, color: '#fb7185' }}>
+            el problema
+          </span>
+          <p style={icStyles.argText}>
+            Hoy, un humedal urbano no tiene representación económica.
+            Puede ser rellenado, pavimentado o contaminado
+            sin que el mercado lo penalice.
+            Su destrucción no aparece en ningún balance.
+            Su silencio no tiene precio.
+          </p>
+          <p style={icStyles.argText}>
+            Antes de que un ecosistema muera, cambia su soundscape.
+            La biofonia desaparece primero — los pájaros, los insectos, los anfibios.
+            Ese silencio es la señal más temprana de colapso ecológico.
+            Y nadie la está escuchando.
+          </p>
+        </div>
+
+        <div style={icStyles.argCol}>
+          <span className="aura-mono" style={{ ...icStyles.argLabel, color: '#6ee7b7' }}>
+            la respuesta
+          </span>
+          <p style={icStyles.argText}>
+            Con AURA, ese humedal tiene un registro histórico de su salud acústica
+            desde el día 1 del nodo. Un índice de degradación o regeneración
+            a lo largo del tiempo. Una representación en la red que puede ser
+            citada, comprada, donada o presentada como evidencia.
+          </p>
+          <p style={icStyles.argText}>
+            El soundscape se convierte en activo verificable.
+            El ecosistema, en agente económico con voz medible.
+            La destrucción, en algo que el mercado ya no puede ignorar.
+          </p>
+        </div>
+      </div>
+
+      {/* The central claim — full width, large */}
+      <div style={icStyles.claim}>
+        <div style={icStyles.claimLine} />
+        <p style={icStyles.claimText}>
+          "Los ecosistemas son agentes con voz propia.
+          Lo que falta no es la voz —
+          es la infraestructura para escucharla,
+          registrarla y valorarla."
+        </p>
+        <div style={icStyles.claimLine} />
+      </div>
+
+      {/* Three economic mechanisms */}
+      <div style={icStyles.mechGrid}>
+        <Mechanism
+          number="01"
+          title="Archivo inmutable"
+          body="El historial acústico de un ecosistema registrado en blockchain no puede ser alterado. Es evidencia legal, científica y política. Nadie puede decir que el bosque siempre estuvo así."
+          color="#4ab8d8"
+        />
+        <Mechanism
+          number="02"
+          title="Valor por rareza"
+          body="Una especie rara detectada en el nodo genera más valor en la red. La biodiversidad tiene precio. Proteger el ecosistema se vuelve económicamente racional."
+          color="#6ee7b7"
+        />
+        <Mechanism
+          number="03"
+          title="Justicia sonora"
+          body="Las colonias con menos verde urbano tienen soundscapes más degradados. AURA hace esa desigualdad visible, medible y comparable. El dato es el argumento."
+          color="#c45c2a"
+        />
+      </div>
+
+    </div>
+  );
+}
+
+function Mechanism({ number, title, body, color }: {
+  number: string; title: string; body: string; color: string;
+}) {
+  return (
+    <div style={icStyles.mech}>
+      <span className="aura-mono" style={{ ...icStyles.mechNumber, color }}>{number}</span>
+      <h4 style={icStyles.mechTitle}>{title}</h4>
+      <p style={icStyles.mechBody}>{body}</p>
+    </div>
+  );
+}
+
+const icStyles: Record<string, CSSProperties> = {
+  wrapper: {
+    display: 'grid',
+    gap: 72,
+    padding: '40px 0',
+  },
+  ruleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 20,
+  },
+  ruleLine: {
+    flex: 1,
+    height: 1,
+    background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.2), transparent)',
+  },
+  ruleLabel: {
+    fontSize: 9,
+    letterSpacing: '0.4em',
+    color: 'rgba(110,231,183,0.35)',
+    textTransform: 'uppercase',
+    flexShrink: 0,
+  },
+  opening: {
+    maxWidth: 800,
+    margin: '0 auto',
+    textAlign: 'center',
+    display: 'grid',
+    gap: 28,
+  },
+  openingEyebrow: {
+    fontSize: 10,
+    letterSpacing: '0.28em',
+    color: 'rgba(110,231,183,0.35)',
+    textTransform: 'uppercase',
+  },
+  openingH: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontSize: 'clamp(1.8rem, 3.5vw, 3.2rem)',
+    fontWeight: 400,
+    lineHeight: 1.15,
+    letterSpacing: '-0.02em',
+    color: '#e8f5ee',
+  },
+  openingBody: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontSize: 'clamp(1rem, 1.3vw, 1.15rem)',
+    lineHeight: 1.7,
+    color: 'rgba(168,230,192,0.65)',
+    maxWidth: 680,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  argGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: 0,
+    border: '1px solid rgba(110,231,183,0.1)',
+  },
+  argCol: {
+    padding: '40px 36px',
+    display: 'grid',
+    gap: 20,
+    alignContent: 'start',
+    borderRight: '1px solid rgba(110,231,183,0.08)',
+  },
+  argLabel: {
+    fontSize: 10,
+    letterSpacing: '0.36em',
+    textTransform: 'uppercase',
+    fontWeight: 300,
+  },
+  argText: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontSize: 'clamp(0.95rem, 1.2vw, 1.05rem)',
+    lineHeight: 1.7,
+    color: 'rgba(168,230,192,0.7)',
+  },
+  claim: {
+    display: 'grid',
+    gap: 32,
+    maxWidth: 720,
+    margin: '0 auto',
+    textAlign: 'center',
+  },
+  claimLine: {
+    height: 1,
+    background: 'linear-gradient(90deg, transparent, rgba(110,231,183,0.25), transparent)',
+  },
+  claimText: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontStyle: 'italic',
+    fontSize: 'clamp(1.2rem, 2vw, 1.7rem)',
+    lineHeight: 1.55,
+    color: 'rgba(168,230,192,0.9)',
+    letterSpacing: '-0.01em',
+  },
+  mechGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: 0,
+    borderTop: '1px solid rgba(110,231,183,0.1)',
+  },
+  mech: {
+    padding: '32px 28px',
+    display: 'grid',
+    gap: 12,
+    alignContent: 'start',
+    borderRight: '1px solid rgba(110,231,183,0.08)',
+    borderBottom: '1px solid rgba(110,231,183,0.06)',
+  },
+  mechNumber: {
+    fontSize: 10,
+    letterSpacing: '0.36em',
+    fontWeight: 300,
+  },
+  mechTitle: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontSize: '1.2rem',
+    fontWeight: 400,
+    color: '#e8f5ee',
+    letterSpacing: '-0.01em',
+  },
+  mechBody: {
+    margin: 0,
+    fontFamily: 'var(--font-serif), serif',
+    fontSize: '0.95rem',
+    lineHeight: 1.65,
+    color: 'rgba(168,230,192,0.6)',
+  },
+};
 
 function Pillar({ label, body, color }: { label: string; body: string; color: string }) {
   return (
