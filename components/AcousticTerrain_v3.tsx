@@ -504,12 +504,8 @@ function QuadrantDividers() {
 
   return (
     <group>
-      <line geometry={hGeo}>
-        <lineBasicMaterial color={color} transparent opacity={0.4} linewidth={1} />
-      </line>
-      <line geometry={vGeo}>
-        <lineBasicMaterial color={color} transparent opacity={0.4} linewidth={1} />
-      </line>
+      <primitive object={new THREE.Line(hGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.4 }))} />
+      <primitive object={new THREE.Line(vGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.4 }))} />
     </group>
   );
 }
